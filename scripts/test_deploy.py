@@ -20,7 +20,7 @@ def fail(message: str) -> int:
 def main() -> int:
     subprocess.run([sys.executable, str(ROOT / "scripts" / "build_site.py")], check=True)
     required = [
-        "index.html", "styles.css", "app.js", "404.html", "favicon.svg", "social-preview.png", ".nojekyll",
+        "index.html", "styles.css", "app.js", "explore.html", "explore.css", "explore.js", "404.html", "favicon.svg", "social-preview.png", ".nojekyll",
         "data/interventions.json", "data/claims.json", "data/sources.json",
     ]
     missing = [p for p in required if not (OUT / p).exists()]
@@ -29,7 +29,7 @@ def main() -> int:
 
     html = (OUT / "index.html").read_text(encoding="utf-8")
     canonical_text_paths = [
-        "index.html", "styles.css", "app.js", "404.html", "favicon.svg",
+        "index.html", "styles.css", "app.js", "explore.html", "explore.css", "explore.js", "404.html", "favicon.svg",
         "data/interventions.json", "data/claims.json", "data/sources.json",
     ]
     for rel in canonical_text_paths:
@@ -41,6 +41,11 @@ def main() -> int:
         return fail("built app still escapes the Pages artifact for data")
     if "fetch('./data/" not in app:
         return fail("built app has no root-relative data fetches")
+    explore = (OUT / "explore.js").read_text(encoding="utf-8")
+    if "../data/" in explore or "fetch('./data/" not in explore:
+        return fail("built guided-reading page must fetch data from inside the artifact")
+    if 'href="./explore.html"' not in html:
+        return fail("evidence map does not link to the guided reading")
     if 'id="reviewDate"' not in html:
         return fail("review-date element missing")
     visible = " ".join(html_lib.unescape(re.sub(r"<[^>]+>", " ", html)).split())

@@ -47,6 +47,7 @@ a { color: inherit; }
 .brand { display: inline-flex; gap: .7rem; align-items: center; text-decoration: none; font-size: .78rem; letter-spacing: .16em; font-weight: 700; }
 .brand-mark { width: 26px; height: 26px; border: 1px solid var(--line-strong); display:grid; place-items:center; border-radius:50%; color:var(--accent); }
 .header-actions { display:flex; gap:.55rem; }
+a.ghost-button { text-decoration:none; display:inline-flex; align-items:center; }
 .trust-label-short { display:none; }
 .ghost-button, .trust-button, .filter-chip, .view-option {
   border:1px solid var(--line); background:transparent; border-radius:999px; cursor:pointer; transition: .2s ease;

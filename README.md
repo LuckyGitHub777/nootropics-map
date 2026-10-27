@@ -61,7 +61,7 @@ The generated `_site/` is path-safe for both a GitHub project Pages URL and a fu
 
 - `data/` — structured sources, claims, and intervention records.
 - `schemas/` — JSON shape contracts.
-- `web/` — the visual evidence explorer.
+- `web/` — the visual evidence explorer (`index.html`) and the guided reading of the community chart (`explore.html`).
 - `scripts/` — validation and reproducible build checks.
 - `tests/` — behavior and data tests.
 - `docs/evidence-model.md` — evidence semantics and confidence boundaries.

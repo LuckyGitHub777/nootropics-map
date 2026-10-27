@@ -1,15 +1,15 @@
 {
   "name": "nootropics-map",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Source-backed visual evidence map for nootropics and cognition-related interventions.",
   "scripts": {
-    "check:js": "node --check web/app.js",
+    "check:js": "node --check web/app.js && node --check web/explore.js",
     "test:js": "node --test tests/*.test.mjs",
     "test": "npm run check:js && npm run test:js",
     "build": "python scripts/build_site.py",
     "test:deploy": "python scripts/test_deploy.py",
-    "verify": "python scripts/validate.py && python scripts/opsec_scan.py && python scripts/test_site.py && python scripts/test_contrast.py && python scripts/test_branding.py && python scripts/test_map_geometry.py && node --check web/app.js && node --test tests/*.test.mjs && python scripts/test_deploy.py",
+    "verify": "python scripts/validate.py && python scripts/opsec_scan.py && python scripts/test_site.py && python scripts/test_contrast.py && python scripts/test_branding.py && python scripts/test_map_geometry.py && python scripts/test_explore.py && node --check web/app.js && node --check web/explore.js && node --test tests/*.test.mjs && python scripts/test_deploy.py",
     "test:branding": "python scripts/test_branding.py"
   },
   "engines": {
