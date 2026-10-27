@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0 — 2026-10-27
+
+- Added a guided-reading page (`explore.html`) that explains the community Nootroflix chart in 47 ideas across eight branches, with simple and detailed reading depth and keyboard navigation.
+- Added a side-by-side comparison of community signal and reviewed evidence, claim-by-claim pathways, and expandable evidence receipts with status, source support, limitations, safety context, and review date.
+- The page reads every reviewed claim and source from `data/*.json`; no evidence is duplicated in page code.
+- Kept the community-signal layer out of the product until a provenance-complete dataset exists; the page describes the chart in words without reproducing its placements or naming high-risk substances.
+- Linked the evidence map header to the guided reading and added regression coverage for structure, data sourcing, the 47-idea reading, palette parity, and the safety boundary.
+
 ## 0.1.0 — 2026-10-27
 
 - Promoted the fully verified rc.6 candidate to the first public release.

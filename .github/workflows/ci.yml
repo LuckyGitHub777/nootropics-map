@@ -37,8 +37,10 @@ jobs:
         run: python scripts/test_contrast.py
       - name: Branding and release-target invariants
         run: python scripts/test_branding.py
+      - name: Guided-reading page checks
+        run: python scripts/test_explore.py
       - name: JavaScript syntax
-        run: node --check web/app.js
+        run: node --check web/app.js && node --check web/explore.js
       - name: JavaScript tests
         run: node --test tests/*.test.mjs
       - name: Deployment artifact test

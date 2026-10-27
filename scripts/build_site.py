@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 WEB = ROOT / "web"
 DATA = ROOT / "data"
 OUT = ROOT / "_site"
-TEXT_ASSETS = ["index.html", "styles.css", "app.js", "404.html", "favicon.svg"]
+TEXT_ASSETS = ["index.html", "styles.css", "app.js", "explore.html", "explore.css", "explore.js", "404.html", "favicon.svg"]
 BINARY_ASSETS = ["social-preview.png"]
 
 
@@ -19,7 +19,7 @@ def main() -> int:
     # Normalize deployable text to canonical LF bytes on every operating system.
     for name in TEXT_ASSETS:
         text = (WEB / name).read_text(encoding="utf-8")
-        if name == "app.js":
+        if name in ("app.js", "explore.js"):
             text = text.replace("fetch('../data/", "fetch('./data/")
         (OUT / name).write_bytes(text.encode("utf-8"))
 

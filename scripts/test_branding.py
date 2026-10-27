@@ -24,8 +24,11 @@ def main() -> int:
 
     if package.get("name") != "nootropics-map":
         errors.append("package name must be nootropics-map")
-    if package.get("version") != "0.1.0":
-        errors.append("package version must match 0.1.0")
+    version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+    if package.get("version") != version:
+        errors.append(f"package version {package.get('version')} must match VERSION {version}")
+    if f"## {version} " not in (ROOT / "CHANGELOG.md").read_text(encoding="utf-8"):
+        errors.append(f"CHANGELOG entry missing for {version}")
     if not readme.startswith("# Nootropics Map"):
         errors.append("README title must be Nootropics Map")
     if "https://luckygithub777.github.io/nootropics-map/" not in domain:
@@ -46,7 +49,9 @@ def main() -> int:
     if 'id="mapKey"' not in index or "compactOffsets" not in app or ".map-key-item" not in styles:
         errors.append("responsive mobile map key/collision treatment missing")
     prohibited_exts = {".jpg", ".jpeg", ".png", ".webp"}
-    images = {p.relative_to(ROOT) for p in ROOT.rglob("*") if p.is_file() and p.suffix.lower() in prohibited_exts}
+    skip_dirs = {".git", "_site", "node_modules"}  # build output and VCS internals are not release sources
+    images = {p.relative_to(ROOT) for p in ROOT.rglob("*")
+              if p.is_file() and p.suffix.lower() in prohibited_exts and not skip_dirs.intersection(p.relative_to(ROOT).parts)}
     allowed_images = {Path("web/social-preview.png")}
     if images != allowed_images:
         errors.append(f"raster release boundary mismatch: expected {sorted(map(str, allowed_images))}, found {sorted(map(str, images))}")
