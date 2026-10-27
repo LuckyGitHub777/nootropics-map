@@ -333,3 +333,28 @@ footer { width:min(1180px, calc(100% - 40px)); margin:0 auto; border-top:1px sol
   .trust-pillars { grid-template-columns:repeat(2, minmax(0,1fr)); }
   .card-grid > .evidence-card { flex-basis:100%; }
 }
+
+/* Source-aware search: one quiet, centered note under the hero search; meaning is carried by text, not color. */
+.search-resolution { max-width:720px; margin:1rem auto 0; padding:1.2rem 1.4rem 1.3rem; border:1px solid var(--line); border-radius:20px; background:rgba(255,255,255,.018); text-align:center; display:grid; justify-items:center; gap:.45rem; }
+.search-resolution[hidden] { display:none; }
+.resolution-label { margin:0; display:inline-flex; align-items:center; gap:.5rem; font-size:.66rem; letter-spacing:.16em; text-transform:uppercase; font-weight:700; color:var(--accent); }
+.resolution-mark { width:9px; height:9px; border-radius:50%; border:1.5px solid var(--accent); flex:none; }
+.search-resolution[data-state="reviewed"] .resolution-mark { background:var(--accent); }
+.search-resolution[data-state="broader"] .resolution-mark { background:linear-gradient(90deg, var(--accent) 50%, transparent 50%); }
+.search-resolution[data-state="later-image"] .resolution-mark { border-style:dashed; }
+.search-resolution[data-state="not-mapped"] .resolution-mark { width:10px; height:0; border-radius:0; border-width:1.5px 0 0; border-color:var(--muted); }
+.resolution-title { margin:0; font-family:Georgia,"Times New Roman",serif; font-size:clamp(1.35rem,3vw,1.75rem); line-height:1.15; color:var(--text); overflow-wrap:anywhere; }
+.resolution-body, .resolution-secondary, .resolution-filter { margin:0; max-width:600px; color:var(--muted); font-size:.88rem; line-height:1.55; }
+.resolution-secondary { color:var(--faint); font-size:.82rem; }
+.resolution-secondary[hidden], .resolution-filter[hidden], .resolution-actions[hidden] { display:none; }
+.resolution-filter { font-size:.78rem; font-style:italic; }
+.resolution-actions { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:.6rem 1.1rem; margin-top:.45rem; }
+.resolution-action { border:1px solid rgba(217,200,162,.45); border-radius:999px; cursor:pointer; transition:.2s ease; padding:.6rem 1rem; font-size:.8rem; color:var(--text); background:var(--accent-soft); }
+.resolution-link { color:var(--muted); font-size:.78rem; text-decoration:underline; text-decoration-color:var(--line-strong); text-underline-offset:3px; }
+.resolution-link:hover { color:var(--text); }
+.resolution-link:focus-visible { outline:2px solid var(--accent); outline-offset:3px; border-radius:4px; }
+.empty-state { text-align:center; max-width:600px; margin:0 auto; }
+@media (max-width: 650px) {
+  .search-resolution { padding:1rem 1rem 1.1rem; border-radius:16px; }
+  .resolution-body, .resolution-secondary { font-size:.84rem; }
+}

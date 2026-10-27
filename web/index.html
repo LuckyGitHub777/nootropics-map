@@ -52,10 +52,20 @@
       </p>
       <div class="search-shell">
         <label class="sr-only" for="searchInput">Search Nootropics Map</label>
+        <span class="sr-only" id="searchScope">Results explain whether a term has a reviewed record, broader reviewed record, source context, or is not mapped in this release.</span>
         <span aria-hidden="true" class="search-icon">⌕</span>
-        <input id="searchInput" type="search" autocomplete="off" placeholder="Search sleep, light, creatine, meditation…" />
+        <input id="searchInput" type="search" autocomplete="off" aria-describedby="searchScope" placeholder="Search sleep, light, creatine, meditation…" />
         <kbd>/</kbd>
       </div>
+      <section class="search-resolution" id="searchResolution" aria-labelledby="resolutionLabel" hidden>
+        <p class="resolution-label"><span class="resolution-mark" id="resolutionMark" aria-hidden="true"></span><span id="resolutionLabel"></span></p>
+        <p class="resolution-title" id="resolutionTitle"></p>
+        <p class="resolution-body" id="resolutionBody"></p>
+        <p class="resolution-secondary" id="resolutionSecondary"></p>
+        <p class="resolution-filter" id="resolutionFilter" hidden></p>
+        <div class="resolution-actions" id="resolutionActions"></div>
+      </section>
+      <p class="sr-only" id="searchAnnounce" role="status" aria-live="polite" aria-atomic="true"></p>
       <div class="hero-principles" aria-label="Evidence principles"><span>Source-backed</span><span>Uncertainty visible</span><span>No rankings</span></div>
       <div class="hero-meta" aria-label="Current evidence bundle metadata">
         <span><strong id="interventionCount">—</strong> interventions</span>
@@ -133,7 +143,7 @@
         </div>
       </div>
       <div id="cardGrid" class="card-grid" aria-live="polite"></div>
-      <p id="emptyState" class="empty-state" hidden>No matching evidence records.</p>
+      <p id="emptyState" class="empty-state" hidden>No reviewed record in this view matches this search.</p>
     </section>
 
     <section class="trust-strip" aria-labelledby="trust-strip-title">
