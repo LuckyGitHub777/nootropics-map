@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <title>Not Found · Nootropics Map</title>
+  <style>
+    body{margin:0;background:#0a0a0a;color:#f0ede4;font:16px system-ui;display:grid;place-items:center;min-height:100vh;text-align:center;padding:24px}
+    main{max-width:520px}p{color:#a6a197}a{color:#d9c8a2}h1{font:400 clamp(2.5rem,8vw,5rem) Georgia,serif;margin:.4rem 0 1rem}
+  </style>
+</head>
+<body>
+  <main>
+    <p>NOOTROPICS / MAP</p>
+    <h1>Nothing here.</h1>
+    <p><a id="homeLink" href="./">Return to Nootropics Map</a></p>
+  </main>
+  <script>
+    (() => {
+      const parts = location.pathname.split('/').filter(Boolean);
+      const projectHome = location.hostname.endsWith('.github.io') && parts.length ? `/${parts[0]}/` : '/';
+      document.getElementById('homeLink').href = projectHome;
+    })();
+  </script>
+</body>
+</html>

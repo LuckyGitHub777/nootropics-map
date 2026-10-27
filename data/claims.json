@@ -1,0 +1,116 @@
+[
+  {
+    "id": "CLM-SLEEP-HEALTH-001",
+    "intervention_id": "INT-SLEEP",
+    "claim": "Adequate, good-quality sleep is a foundational health behavior, and recommended sleep duration varies by age.",
+    "claim_type": "benefit",
+    "status": "supported",
+    "confidence": "high",
+    "source_ids": [
+      "SRC-CDC-SLEEP-2024"
+    ],
+    "source_claims": [
+      {
+        "source_id": "SRC-CDC-SLEEP-2024",
+        "summary": "CDC states that good sleep is essential for health and emotional well-being and provides age-based sleep-duration guidance."
+      }
+    ],
+    "limitations": [
+      "This record summarizes population-level guidance and does not diagnose an individual's sleep needs or sleep disorder."
+    ],
+    "last_reviewed": "2026-10-27"
+  },
+  {
+    "id": "CLM-EXERCISE-HEALTH-001",
+    "intervention_id": "INT-PHYSICAL-ACTIVITY",
+    "claim": "Regular physical activity has immediate and long-term health benefits, including benefits related to sleep, anxiety, brain health, and chronic-disease risk.",
+    "claim_type": "benefit",
+    "status": "supported",
+    "confidence": "high",
+    "source_ids": [
+      "SRC-CDC-PHYSICAL-ACTIVITY-2026"
+    ],
+    "source_claims": [
+      {
+        "source_id": "SRC-CDC-PHYSICAL-ACTIVITY-2026",
+        "summary": "CDC lists immediate benefits such as improved sleep quality and reduced anxiety, plus long-term benefits across brain and cardiometabolic health."
+      }
+    ],
+    "limitations": [
+      "Benefit magnitude and appropriate activity level vary by person, health status, and outcome.",
+      "This is not an individualized exercise prescription."
+    ],
+    "last_reviewed": "2026-10-27"
+  },
+  {
+    "id": "CLM-CREATINE-PERFORMANCE-001",
+    "intervention_id": "INT-CREATINE",
+    "claim": "Creatine supplementation can improve strength, power, and performance during repeated short-duration, high-intensity efforts, while individual response varies.",
+    "claim_type": "benefit",
+    "status": "supported_with_qualification",
+    "confidence": "high",
+    "source_ids": [
+      "SRC-NIH-ODS-CREATINE"
+    ],
+    "source_claims": [
+      {
+        "source_id": "SRC-NIH-ODS-CREATINE",
+        "summary": "NIH ODS reports numerous clinical trials generally showing benefits for high-intensity intermittent activity and notes variation in individual response."
+      }
+    ],
+    "limitations": [
+      "This claim is about specific exercise-performance outcomes, not a general claim of cognitive enhancement.",
+      "Safety and suitability can depend on individual circumstances."
+    ],
+    "last_reviewed": "2026-10-27"
+  },
+  {
+    "id": "CLM-LIGHT-CIRCADIAN-001",
+    "intervention_id": "INT-MORNING-LIGHT",
+    "claim": "Light exposure affects human circadian timing in a time-dependent way; morning light generally advances circadian timing while evening light generally delays it.",
+    "claim_type": "mechanism",
+    "status": "supported_with_qualification",
+    "confidence": "high",
+    "source_ids": [
+      "SRC-NIOSH-LIGHT-CIRCADIAN",
+      "SRC-PRAYAG-LIGHT-2019"
+    ],
+    "source_claims": [
+      {
+        "source_id": "SRC-NIOSH-LIGHT-CIRCADIAN",
+        "summary": "NIOSH explains that bright morning light generally produces a phase advance and bright evening light a phase delay for people on regular schedules."
+      },
+      {
+        "source_id": "SRC-PRAYAG-LIGHT-2019",
+        "summary": "The review describes strong time-of-day-dependent effects of light on circadian timing, wakefulness, and sleep."
+      }
+    ],
+    "limitations": [
+      "Exact response depends on biological timing, intensity, duration, wavelength, and prior light exposure.",
+      "The record does not prescribe light therapy for an individual condition."
+    ],
+    "last_reviewed": "2026-10-27"
+  },
+  {
+    "id": "CLM-MEDITATION-WELLBEING-001",
+    "intervention_id": "INT-MEDITATION",
+    "claim": "Meditation and mindfulness practices may help some health and well-being outcomes, but evidence quality and effectiveness vary substantially by condition, intervention, and study design.",
+    "claim_type": "benefit",
+    "status": "supported_with_qualification",
+    "confidence": "moderate",
+    "source_ids": [
+      "SRC-NCCIH-MEDITATION"
+    ],
+    "source_claims": [
+      {
+        "source_id": "SRC-NCCIH-MEDITATION",
+        "summary": "NCCIH describes possible benefits across several outcomes while emphasizing that much of the literature is preliminary, heterogeneous, or at risk of optimistic interpretation."
+      }
+    ],
+    "limitations": [
+      "Meditation is not one uniform intervention.",
+      "Results differ by outcome and study quality, and some people report negative experiences."
+    ],
+    "last_reviewed": "2026-10-27"
+  }
+]

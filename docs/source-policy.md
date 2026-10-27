@@ -1,0 +1,43 @@
+# Source Policy
+
+Nootropics Map is only as credible as the trace from a public claim back to its evidence.
+
+## Preferred source order
+
+1. systematic reviews and meta-analyses when the question fits them;
+2. clinical guidelines or authoritative public-health references;
+3. randomized or controlled human studies;
+4. well-designed observational human evidence;
+5. preclinical evidence for mechanism/context only;
+6. self-report or community data as a separate signal layer, never as clinical proof.
+
+Source hierarchy is contextual, not mechanical. A primary trial may be more informative than an outdated review, and a mechanistic paper cannot establish a human benefit by itself.
+
+## Record requirements
+
+A public source record should include, when available:
+
+- stable title and publisher/journal;
+- source type;
+- publication date;
+- DOI or stable public URL;
+- retrieval/review date;
+- a bounded summary of what the source supports;
+- known limitations relevant to the claim.
+
+## Claim discipline
+
+Claims should be narrow enough that a reviewer can answer: “Do these specific sources support this specific statement?”
+
+Avoid:
+
+- extrapolating animal or cell results into human benefit;
+- treating association as causation;
+- converting absence of evidence into evidence of absence;
+- hiding contradictory findings;
+- presenting popularity or novelty as efficacy;
+- mirroring copyrighted full text when a citation and bounded summary are sufficient.
+
+## Review cadence
+
+Source links and review dates should be refreshed before a public release that materially changes an evidence assessment. Changes in confidence or status should be reviewable in version history.
