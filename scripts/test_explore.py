@@ -52,6 +52,72 @@ class Inspector(HTMLParser):
             self.blank_links_unsafe += 1
 
 
+# Data-about-data diagnostics, recomputed from the published 2022 result table and plotting code
+# (life-changing plot: count_without_ssc > 10, x = count). Plotted subset only: 125 rows -> 116 plotted;
+# Spearman(count, proba_life_changing) = 0.1415; median interval width 0.0484 (count < 50, n = 20)
+# vs 0.0123 (count >= 500, n = 20) = 3.92x. The 4.49x figure uses all 125 rows and must not appear here.
+DAD_REQUIRED = [
+    "published 2022", "125 result-table items", "116 plotted", "more than 10 new", "spearman ρ ≈ 0.14",
+    "fewer than 50 ratings", "500 or more ratings", "20 items · median width ≈ 0.048", "20 items · median width ≈ 0.012",
+    "about 4× wider", "≈3.9×", "median model interval width", "not the size of any effect",
+    "weak and positive", "precision", "validity", "randomization", "blinding", "placebo control",
+    "representative sampling", "causal inference", "more ratings are not better scientific evidence",
+]
+DAD_FORBIDDEN = ["4.49", "4.5×", "no relationship", "zero relationship", "independen", "data proves", "best",
+                 "winner", "most effective", "top intervention", "causes", "ten or fewer", "handful"]
+
+
+def check_data_about_data(html: str, css: str) -> list[str]:
+    errors: list[str] = []
+    start = html.find('<section id="dataAboutData"')
+    if start == -1:
+        return ["data-about-data section missing"]
+    section = html[start:html.index("</section>", start)]
+    text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", section)).replace("&rsquo;", "’").lower()
+    text = re.sub(r"\s+", " ", text)
+    for needle in DAD_REQUIRED:
+        if needle.lower() not in text:
+            errors.append(f"data about data: missing {needle!r}")
+    for needle in DAD_FORBIDDEN:
+        if needle.lower() in text:
+            errors.append(f"data about data: forbidden wording {needle!r}")
+    # Every quantitative figure belongs to the published 2022 analysis; the later image is only named to exclude it.
+    for sentence in re.split(r"(?<=[.!?])\s", text):
+        if "later" in sentence and not re.search(r"\bnone\b|\bnot\b|undocumented", sentence):
+            errors.append("data about data: a figure is attributed to the later supplied image")
+    if "describes the later supplied image" not in text or "none of it" not in text:
+        errors.append("data about data: must state that no figure describes the later supplied image")
+    # Numbers must be internally consistent with each other.
+    nums = {k: re.search(p, text) for k, p in {"rows": r"(\d+) result-table items", "plotted": r"(\d+) plotted",
+             "rho": r"ρ ≈ (0\.\d+)", "low": r"median width ≈ (0\.\d+)"}.items()}
+    if not all(nums.values()):
+        errors.append("data about data: figures not stated in text")
+    else:
+        rows, plotted = int(nums["rows"].group(1)), int(nums["plotted"].group(1))
+        widths = [float(w) for w in re.findall(r"median width ≈ (0\.\d+)", text)]
+        if (rows, plotted) != (125, 116) or "nine items left off" not in text:
+            errors.append(f"data about data: expected 125 rows and 116 plotted (nine left off), got {rows}/{plotted}")
+        if abs(float(nums["rho"].group(1)) - 0.1415) > 0.006:
+            errors.append(f"data about data: rho {nums['rho'].group(1)} does not match 0.1415")
+        if len(widths) != 2 or abs(widths[0] - 0.0484) > 0.0006 or abs(widths[1] - 0.0123) > 0.0006:
+            errors.append(f"data about data: interval widths {widths} do not match 0.048 / 0.012")
+    if "<canvas" in section or "<script" in section or "style=" in section:
+        errors.append("data about data: must stay static semantic markup without inline styles")
+    if not re.search(r'<h2 id="dadTitle">', section) or section.count("<h3>") != 4:
+        errors.append("data about data: needs one h2 and four h3 findings")
+    if section.count('class="sr-only">is not<') != 4:
+        errors.append("data about data: ≠ marks need spoken equivalents")
+    for selector, value in {".iw-high": "width: 25.53%", ".iw-low": "width: 100%", ".rho-mark": "left: 57.08%"}.items():
+        rule = re.search(re.escape(selector) + r"\s*\{([^}]*)\}", css)
+        if not rule or value not in rule.group(1):
+            errors.append(f"data about data: {selector} must encode {value} (0.0123/0.0484 and (0.1415+1)/2)")
+    if html.index('id="dataAboutData"') > html.index('id="lenses"') or html.index('id="sourceState"') > html.index('id="dataAboutData"'):
+        errors.append("data about data: must sit between the source states and signal-versus-evidence")
+    if 'href="#dataAboutData"' not in html:
+        errors.append("data about data: navigation link missing")
+    return errors
+
+
 def main() -> int:
     errors: list[str] = []
     html = (WEB / "explore.html").read_text(encoding="utf-8")
@@ -143,6 +209,8 @@ def main() -> int:
             errors.append(f"published-code fact missing: {fact}")
     if 'id="differentquestions"' not in lowered or "different questions" not in lowered:
         errors.append("creatine must be framed as different questions, not a disagreement")
+    errors.extend(check_data_about_data(html, css))
+
     # Unrelated-project terminology is matched by hashed word n-grams so the deny-list itself stays private.
     for path in WEB.glob("*"):
         if not (path.is_file() and path.suffix in {".html", ".js", ".css"}):

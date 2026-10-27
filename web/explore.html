@@ -30,6 +30,7 @@
     </a>
     <nav class="nav" aria-label="Sections">
       <a href="./">Evidence map</a>
+      <a href="#dataAboutData">Data about data</a>
       <a href="#lenses">Signal and evidence</a>
       <a href="#pathways">Pathways</a>
       <a href="#reading">Guided reading</a>
@@ -53,6 +54,67 @@
         <p><strong>Published 2022 analysis.</strong> 36,163 ratings from 2,802 people; a public result table of 125 items, of which the published code plots the 116 with more than 10 new ratings. Every number on this page comes from this state.</p>
         <p><strong>Later supplied image.</strong> A larger version of the chart image also circulates. The later image includes labels such as Doing Math that are absent from the 2022 result table, and it draws its y-axis differently. Its underlying dataset has not been published, so none of the 2022 totals or positions are assigned to it.</p>
       </aside>
+    </section>
+
+    <section id="dataAboutData" class="dad" aria-labelledby="dadTitle">
+      <div class="head">
+        <p class="eyebrow">Data about data · published 2022 analysis</p>
+        <h2 id="dadTitle">What the data says about itself</h2>
+        <p>The chart contains clues about how much confidence to place in the chart itself. Every figure in this section was recomputed from the published 2022 result table and plotting code. None of it describes the later supplied image, whose dataset remains undocumented.</p>
+      </div>
+      <ol class="dad-list">
+        <li class="dad-step">
+          <p class="dad-num" aria-hidden="true">01</p>
+          <h3>Not every result becomes a plotted point.</h3>
+          <p class="dad-figure"><span class="dad-big">125</span> <span class="dad-arrow" aria-hidden="true">→</span><span class="sr-only">become</span> <span class="dad-big">116</span></p>
+          <p class="dad-caption">125 result-table items → 116 plotted</p>
+          <p>The published plot draws an item only when it has more than 10 new Nootroflix ratings. The nine items left off still appear in the result table. Leaving them off says nothing about whether they work or are safe, only that there were few new ratings to place them.</p>
+        </li>
+        <li class="dad-step">
+          <p class="dad-num" aria-hidden="true">02</p>
+          <h3>More ratings do not mean more reported impact.</h3>
+          <figure class="dad-rho">
+            <p class="dad-figure"><span class="dad-big">Spearman ρ ≈ 0.14</span></p>
+            <div class="rho-scale" aria-hidden="true">
+              <span class="rho-track"></span>
+              <span class="rho-tick at-min">−1</span>
+              <span class="rho-tick at-zero">0</span>
+              <span class="rho-tick at-max">+1</span>
+              <span class="rho-mark"></span>
+            </div>
+            <figcaption class="dad-caption">Rank relationship between rating count and modeled life-changing probability across the 116 plotted items, on a scale from −1 to +1</figcaption>
+          </figure>
+          <p>Popularity and reported transformation barely move together: the rank relationship is weak and positive. High volume is not evidence quality, and reported transformation is not scientific efficacy.</p>
+        </li>
+        <li class="dad-step">
+          <p class="dad-num" aria-hidden="true">03</p>
+          <h3>Less data means more uncertainty.</h3>
+          <figure class="dad-widths">
+            <figcaption class="dad-caption">Median model interval width for the chance of a 10, plotted items grouped by total ratings</figcaption>
+            <div class="iw-row">
+              <p class="iw-label"><strong>Fewer than 50 ratings</strong><span>20 items · median width ≈ 0.048</span></p>
+              <span class="iw-line iw-low" aria-hidden="true"></span>
+            </div>
+            <div class="iw-row">
+              <p class="iw-label"><strong>500 or more ratings</strong><span>20 items · median width ≈ 0.012</span></p>
+              <span class="iw-line iw-high" aria-hidden="true"></span>
+            </div>
+          </figure>
+          <p>For sparsely rated items the model&rsquo;s interval is about 4× wider (≈3.9×) than for widely rated ones. Line length shows the width of uncertainty, not the size of any effect.</p>
+        </li>
+        <li class="dad-step">
+          <p class="dad-num" aria-hidden="true">04</p>
+          <h3>More ratings can narrow an estimate. They cannot turn self-report into an experiment.</h3>
+          <p>More observations can tighten the community estimate. They do not add randomization, blinding, placebo control, representative sampling or causal inference, so more ratings are not better scientific evidence.</p>
+          <ul class="dad-neq" aria-label="Distinctions to keep">
+            <li>Volume <span aria-hidden="true">≠</span><span class="sr-only">is not</span> truth</li>
+            <li>Reported impact <span aria-hidden="true">≠</span><span class="sr-only">is not</span> efficacy</li>
+            <li>Precision <span aria-hidden="true">≠</span><span class="sr-only">is not</span> validity</li>
+            <li>Signal <span aria-hidden="true">≠</span><span class="sr-only">is not</span> recommendation</li>
+          </ul>
+        </li>
+      </ol>
+      <p class="dad-close">The chart does not only describe interventions. Its shape also tells us how carefully the chart itself should be read.</p>
     </section>
 
     <section id="lenses" aria-labelledby="lensTitle">
