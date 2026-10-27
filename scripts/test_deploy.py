@@ -28,6 +28,14 @@ def main() -> int:
         return fail(f"missing built paths: {missing}")
 
     html = (OUT / "index.html").read_text(encoding="utf-8")
+    canonical_text_paths = [
+        "index.html", "styles.css", "app.js", "404.html", "favicon.svg",
+        "data/interventions.json", "data/claims.json", "data/sources.json",
+    ]
+    for rel in canonical_text_paths:
+        if b"\r" in (OUT / rel).read_bytes():
+            return fail(f"canonical LF text artifact violated: {rel}")
+
     app = (OUT / "app.js").read_text(encoding="utf-8")
     if "../data/" in app:
         return fail("built app still escapes the Pages artifact for data")
