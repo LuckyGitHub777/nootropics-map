@@ -1,0 +1,30 @@
+name: Evidence review
+about: Propose a bounded source or claim review
+body:
+  - type: textarea
+    id: claim
+    attributes:
+      label: Claim or question
+      description: State the exact bounded claim being reviewed.
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Public sources
+      description: Provide primary or high-quality public sources and stable identifiers where available.
+    validations:
+      required: true
+  - type: textarea
+    id: limitations
+    attributes:
+      label: Known limitations or conflicting evidence
+    validations:
+      required: true
+  - type: checkboxes
+    id: boundary
+    attributes:
+      label: Boundary
+      options:
+        - label: This issue contains no personal medical information, secrets, or private/internal material.
+          required: true

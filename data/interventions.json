@@ -1,0 +1,72 @@
+[
+  {
+    "id": "INT-SLEEP",
+    "slug": "sleep",
+    "name": "Sleep",
+    "category": "behavior",
+    "simple_summary": "Sleep is a foundational recovery process. Enough good-quality sleep supports health and day-to-day functioning.",
+    "detailed_summary": "Population guidance treats adequate, good-quality sleep as foundational to health. Duration needs vary with age, and persistent sleep problems may require professional evaluation rather than simple self-optimization.",
+    "evidence_band": "strong",
+    "claim_ids": [
+      "CLM-SLEEP-HEALTH-001"
+    ],
+    "reviewed_at": "2026-10-27",
+    "safety_note": "Persistent insomnia, excessive sleepiness, breathing problems during sleep, or major sleep disruption can warrant clinical evaluation."
+  },
+  {
+    "id": "INT-PHYSICAL-ACTIVITY",
+    "slug": "physical-activity",
+    "name": "Physical activity",
+    "category": "exercise",
+    "simple_summary": "Moving your body regularly has both immediate and long-term health benefits across several systems.",
+    "detailed_summary": "Evidence-based public-health guidance links regular physical activity with benefits spanning sleep, anxiety, brain health, cardiometabolic health, bone health, and fall prevention. Appropriate type and intensity depend on the person and context.",
+    "evidence_band": "strong",
+    "claim_ids": [
+      "CLM-EXERCISE-HEALTH-001"
+    ],
+    "reviewed_at": "2026-10-27",
+    "safety_note": "People with medical limitations or new concerning symptoms may need individualized guidance before changing activity intensity."
+  },
+  {
+    "id": "INT-CREATINE",
+    "slug": "creatine",
+    "name": "Creatine",
+    "category": "nutrition",
+    "simple_summary": "Creatine is a naturally occurring compound best established as a performance aid for repeated short, intense efforts.",
+    "detailed_summary": "Creatine has extensive exercise-performance research. The strongest established use case in this prototype is strength, power, and repeated high-intensity effort—not a blanket claim that creatine improves cognition or every aspect of performance.",
+    "evidence_band": "strong",
+    "claim_ids": [
+      "CLM-CREATINE-PERFORMANCE-001"
+    ],
+    "reviewed_at": "2026-10-27",
+    "safety_note": "This Nootropics Map record is educational and does not determine whether supplementation is appropriate for a specific person."
+  },
+  {
+    "id": "INT-MORNING-LIGHT",
+    "slug": "morning-light",
+    "name": "Morning light",
+    "category": "environment",
+    "simple_summary": "Light is one of the body's strongest time cues. Morning and evening light can shift the body clock in different directions.",
+    "detailed_summary": "Human circadian responses depend strongly on when light arrives, as well as intensity, duration, wavelength, and prior light exposure. Morning light generally advances circadian timing while evening light generally delays it, but exact response is context-dependent.",
+    "evidence_band": "strong",
+    "claim_ids": [
+      "CLM-LIGHT-CIRCADIAN-001"
+    ],
+    "reviewed_at": "2026-10-27",
+    "safety_note": "Clinical light therapy can require individualized timing; this record does not provide a treatment schedule."
+  },
+  {
+    "id": "INT-MEDITATION",
+    "slug": "meditation",
+    "name": "Meditation & mindfulness",
+    "category": "behavior",
+    "simple_summary": "Meditation and mindfulness are families of attention and awareness practices studied for stress, mood, sleep, pain, and other outcomes.",
+    "detailed_summary": "Some outcomes show meaningful evidence while others are mixed or based on weaker studies. The category contains many different practices, making broad claims unreliable unless the exact intervention and outcome are specified.",
+    "evidence_band": "moderate",
+    "claim_ids": [
+      "CLM-MEDITATION-WELLBEING-001"
+    ],
+    "reviewed_at": "2026-10-27",
+    "safety_note": "Meditation is often considered low risk, but negative experiences have been reported and it is not a substitute for indicated care."
+  }
+]

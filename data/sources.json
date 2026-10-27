@@ -1,0 +1,78 @@
+[
+  {
+    "id": "SRC-CDC-SLEEP-2024",
+    "title": "About Sleep",
+    "publisher": "Centers for Disease Control and Prevention",
+    "authors": [],
+    "publication_date": "2024-05-15",
+    "url": "https://www.cdc.gov/sleep/about/",
+    "doi": null,
+    "source_type": "government_guidance",
+    "retrieved_at": "2026-10-27",
+    "notes": "Public-health overview of sleep need and health relevance."
+  },
+  {
+    "id": "SRC-CDC-PHYSICAL-ACTIVITY-2026",
+    "title": "Health Benefits of Physical Activity for Adults",
+    "publisher": "Centers for Disease Control and Prevention",
+    "authors": [],
+    "publication_date": "2026-03-10",
+    "url": "https://www.cdc.gov/physical-activity-basics/health-benefits/adults.html",
+    "doi": null,
+    "source_type": "government_guidance",
+    "retrieved_at": "2026-10-27",
+    "notes": "Public-health synthesis of immediate and long-term benefits of regular physical activity."
+  },
+  {
+    "id": "SRC-NIH-ODS-CREATINE",
+    "title": "Dietary Supplements for Exercise and Athletic Performance — Health Professional Fact Sheet",
+    "publisher": "NIH Office of Dietary Supplements",
+    "authors": [],
+    "publication_date": null,
+    "url": "https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-HealthProfessional/",
+    "doi": null,
+    "source_type": "government_guidance",
+    "retrieved_at": "2026-10-27",
+    "notes": "Evidence summary for exercise-performance supplements including creatine."
+  },
+  {
+    "id": "SRC-NIOSH-LIGHT-CIRCADIAN",
+    "title": "Effects of Light on Circadian Rhythms",
+    "publisher": "National Institute for Occupational Safety and Health",
+    "authors": [],
+    "publication_date": "2020-03-31",
+    "url": "https://www.cdc.gov/niosh/work-hour-training-for-nurses/longhours/mod2/19.html",
+    "doi": null,
+    "source_type": "government_guidance",
+    "retrieved_at": "2026-10-27",
+    "notes": "Training resource describing time-of-day-dependent effects of light on circadian timing."
+  },
+  {
+    "id": "SRC-PRAYAG-LIGHT-2019",
+    "title": "Light Modulation of Human Clocks, Wake, and Sleep",
+    "publisher": "Clocks & Sleep",
+    "authors": [
+      "Abhishek S. Prayag",
+      "Mirjam Münch",
+      "Daniel Aeschbach"
+    ],
+    "publication_date": "2019-03-13",
+    "url": "https://doi.org/10.3390/clockssleep1010017",
+    "doi": "10.3390/clockssleep1010017",
+    "source_type": "peer_reviewed_review",
+    "retrieved_at": "2026-10-27",
+    "notes": "Open-access peer-reviewed review of how light timing, duration, intensity, pattern, and wavelength influence human circadian timing, wake, and sleep."
+  },
+  {
+    "id": "SRC-NCCIH-MEDITATION",
+    "title": "Meditation and Mindfulness: Effectiveness and Safety",
+    "publisher": "National Center for Complementary and Integrative Health",
+    "authors": [],
+    "publication_date": null,
+    "url": "https://www.nccih.nih.gov/health/meditation-and-mindfulness-effectiveness-and-safety",
+    "doi": null,
+    "source_type": "government_guidance",
+    "retrieved_at": "2026-10-27",
+    "notes": "Government evidence overview emphasizing both potential benefits and methodological limitations."
+  }
+]

@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="description" content="A source-backed visual evidence map for nootropics and cognition-related interventions." />
+  <meta name="theme-color" content="#0a0a09" />
+  <meta name="robots" content="index,follow" />
+  <meta name="application-name" content="Nootropics Map" />
+  <meta property="og:title" content="Nootropics Map" />
+  <meta property="og:description" content="What changes the mind? See the signal. Trace the evidence." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Nootropics Map" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Nootropics Map" />
+  <meta name="twitter:description" content="What changes the mind? See the signal. Trace the evidence." />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <title>Nootropics Map</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#explorer">Skip to explorer</a>
+
+  <header class="site-header" aria-label="Primary">
+    <a class="brand" href="#top" aria-label="Nootropics Map home">
+      <span class="brand-mark" aria-hidden="true">◌</span>
+      <span>NOOTROPICS / MAP</span>
+    </a>
+    <div class="header-actions">
+      <button class="ghost-button" id="methodButton" type="button">Method</button>
+      <button class="trust-button" id="trustButton" type="button">Why trust this?</button>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-field" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+      <p class="eyebrow">A VISUAL FIELD GUIDE · NOOTROPICS · COGNITION · EVIDENCE</p>
+      <h1 id="hero-title">What changes the mind?<br /><span>Follow the evidence.</span></h1>
+      <p class="hero-copy">
+        Explore nootropics and cognition-related interventions—from substances and supplements to sleep, movement, light, and attention—without confusing popularity, novelty, or self-report with scientific evidence.
+      </p>
+      <div class="search-shell">
+        <label class="sr-only" for="searchInput">Search Nootropics Map</label>
+        <span aria-hidden="true" class="search-icon">⌕</span>
+        <input id="searchInput" type="search" autocomplete="off" placeholder="Search sleep, light, creatine, meditation…" />
+        <kbd>/</kbd>
+      </div>
+      <div class="hero-principles" aria-label="Evidence principles"><span>Source-backed</span><span>Uncertainty visible</span><span>No rankings</span></div>
+      <div class="hero-meta" aria-label="Current evidence bundle metadata">
+        <span><strong id="interventionCount">—</strong> interventions</span>
+        <span><strong id="claimCount">—</strong> evidence receipts</span>
+        <span>Reviewed <strong id="reviewDate">—</strong></span>
+      </div>
+    </section>
+
+    <section class="explorer" id="explorer" aria-labelledby="explorer-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">EXPLORE</p>
+          <h2 id="explorer-title">Evidence maturity × Confidence</h2>
+        </div>
+        <p class="section-note">
+          Ordinal evidence-literacy map—not an effect-size score or recommendation engine.
+        </p>
+      </div>
+
+      <div class="filter-row" role="toolbar" aria-label="Filter interventions">
+        <button class="filter-chip active" data-category="all" type="button">All</button>
+        <button class="filter-chip" data-category="behavior" type="button">Behavior</button>
+        <button class="filter-chip" data-category="exercise" type="button">Exercise</button>
+        <button class="filter-chip" data-category="environment" type="button">Environment</button>
+        <button class="filter-chip" data-category="nutrition" type="button">Nutrition</button>
+      </div>
+
+      <div class="atlas-grid">
+        <section class="map-card" aria-label="Evidence maturity and confidence map">
+          <div class="map-header">
+            <div>
+              <span class="mini-label">MAP VIEW</span>
+              <strong id="mapStatus">All evidence records</strong>
+            </div>
+            <div class="legend" aria-label="Evidence legend">
+              <span><i class="legend-dot emerging"></i> Emerging</span>
+              <span><i class="legend-dot moderate"></i> Moderate</span>
+              <span><i class="legend-dot strong"></i> Strong</span>
+            </div>
+          </div>
+          <div class="map-wrap">
+            <svg id="evidenceMap" viewBox="0 0 900 520" role="img" aria-labelledby="map-title map-desc">
+              <title id="map-title">Evidence maturity by assessment confidence</title>
+              <desc id="map-desc">Interactive ordinal plot of prototype interventions by evidence maturity and claim confidence.</desc>
+            </svg>
+            <div class="axis-caption x-axis">Evidence maturity →</div>
+            <div id="mapKey" class="map-key" aria-label="Map key"></div>
+          </div>
+          <div class="axis-caption y-axis">Assessment confidence →</div>
+        </section>
+
+        <aside class="insight-card" aria-labelledby="insight-title">
+          <span class="mini-label">READ THE MAP</span>
+          <h3 id="insight-title">Confidence is not the same as effect size.</h3>
+          <p>
+            High confidence means the bounded claim is better supported; it does not mean the intervention has a larger effect. Evidence maturity and effect magnitude must remain separate.
+          </p>
+          <div class="principle">
+            <span>CORE PRINCIPLE</span>
+            <strong>Preserve uncertainty.</strong>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="library" aria-labelledby="library-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">EVIDENCE LIBRARY</p>
+          <h2 id="library-title">Understand first. Inspect second.</h2>
+        </div>
+        <div class="view-toggle" aria-label="Detail level">
+          <button type="button" class="view-option active" data-view="simple">Simple</button>
+          <button type="button" class="view-option" data-view="detailed">Detailed</button>
+        </div>
+      </div>
+      <div id="cardGrid" class="card-grid" aria-live="polite"></div>
+      <p id="emptyState" class="empty-state" hidden>No matching evidence records.</p>
+    </section>
+
+    <section class="trust-strip" aria-labelledby="trust-strip-title">
+      <div>
+        <p class="eyebrow">TRUST ARCHITECTURE</p>
+        <h2 id="trust-strip-title">Every conclusion should leave a receipt.</h2>
+      </div>
+      <div class="trust-pillars">
+        <div><span>01</span><strong>Source</strong><p>Original public evidence record.</p></div>
+        <div><span>02</span><strong>Claim</strong><p>One bounded statement at a time.</p></div>
+        <div><span>03</span><strong>Limits</strong><p>Uncertainty stays visible.</p></div>
+        <div><span>04</span><strong>Review</strong><p>Changes are versioned and inspectable.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div>Nootropics Map · Evidence, visually mapped</div>
+    <div>Source-backed · Versioned · Educational only</div>
+  </footer>
+
+  <dialog id="detailDialog" class="detail-dialog">
+    <form method="dialog" class="dialog-shell">
+      <button class="dialog-close" aria-label="Close evidence detail">×</button>
+      <div id="dialogContent"></div>
+    </form>
+  </dialog>
+
+  <dialog id="trustDialog" class="detail-dialog compact-dialog">
+    <form method="dialog" class="dialog-shell">
+      <button class="dialog-close" aria-label="Close trust explanation">×</button>
+      <p class="eyebrow">WHY TRUST THIS?</p>
+      <h2>Trust the trace, not the aesthetic.</h2>
+      <p class="dialog-lede">The interface is presentation. Structured evidence records are the system of record.</p>
+      <div class="trust-list">
+        <div><strong>Source-first</strong><p>Material claims map to structured source IDs.</p></div>
+        <div><strong>Qualified</strong><p>Claim status and limitations are displayed independently.</p></div>
+        <div><strong>Versionable</strong><p>Evidence changes are designed to be reviewed as Git diffs.</p></div>
+        <div><strong>Bounded</strong><p>No personalized diagnosis, treatment, dosing, or medication-change instructions.</p></div>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="methodDialog" class="detail-dialog compact-dialog">
+    <form method="dialog" class="dialog-shell">
+      <button class="dialog-close" aria-label="Close methodology">×</button>
+      <p class="eyebrow">METHOD</p>
+      <h2>Separate reputation, self-report, and evidence.</h2>
+      <p class="dialog-lede">
+        v0.1 uses intentionally coarse evidence bands. “Nootropics” is the public front door; inclusion is not proof of enhancement, safety, or a recommendation.
+      </p>
+      <ol class="method-steps">
+        <li><span>1</span><div><strong>Source</strong><p>Capture provenance without copying protected full text.</p></div></li>
+        <li><span>2</span><div><strong>Bound the claim</strong><p>One reviewable statement with explicit limitations.</p></div></li>
+        <li><span>3</span><div><strong>Assess</strong><p>Record status and confidence for that exact claim.</p></div></li>
+        <li><span>4</span><div><strong>Render</strong><p>Explain simply, then expose the evidence receipt.</p></div></li>
+      </ol>
+    </form>
+  </dialog>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>

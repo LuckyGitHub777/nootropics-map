@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/source.schema.json",
+  "title": "Evidence Source",
+  "type": "object",
+  "required": ["id", "title", "publisher", "url", "source_type", "retrieved_at"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^SRC-[A-Z0-9-]+$"},
+    "title": {"type": "string", "minLength": 3},
+    "publisher": {"type": "string", "minLength": 2},
+    "authors": {"type": "array", "items": {"type": "string"}},
+    "publication_date": {"type": ["string", "null"]},
+    "url": {"type": "string", "pattern": "^https://"},
+    "doi": {"type": ["string", "null"]},
+    "source_type": {"enum": ["government_guidance", "systematic_review", "meta_analysis", "randomized_trial", "observational", "peer_reviewed_review", "preclinical", "community_self_report", "other"]},
+    "retrieved_at": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": false
+}
