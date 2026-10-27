@@ -143,6 +143,9 @@ jobs:
           if release.get("name") != os.environ["RELEASE_TITLE"]: problems.append("title mismatch")
           if release.get("draft"): problems.append("release is a draft")
           if release.get("prerelease"): problems.append("release is a prerelease")
+          expected_body = os.environ["RELEASE_NOTES"].replace("\r\n", "\n").rstrip("\n")
+          actual_body = (release.get("body") or "").replace("\r\n", "\n").rstrip("\n")
+          if actual_body != expected_body: problems.append("release body mismatch")
           text = re.sub(r"[^a-z0-9]", "", ((release.get("name") or "") + (release.get("body") or "")).lower())
           if any(hashlib.sha256(text[i:i + n].encode()).hexdigest() in DENIED for n in (6, 7, 9, 11) for i in range(len(text) - n + 1)):
               problems.append("release metadata contains disallowed attribution")
