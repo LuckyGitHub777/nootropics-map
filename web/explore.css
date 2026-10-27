@@ -138,7 +138,7 @@ section { scroll-margin-top: 24px; }
 .halo { paint-order: stroke; stroke: var(--panel); stroke-width: 6px; stroke-linejoin: round; }
 .o-center { fill: var(--panel); stroke: var(--accent); stroke-width: 1.5; }
 .o-ctitle { font: 400 20px var(--display); fill: var(--text); }
-.o-csub { font: 400 11px var(--mono); fill: var(--faint); }
+.o-csub { font: 400 12px var(--mono); fill: var(--faint); }
 .branch-list { display: none; }
 @media (max-width: 759px) { .orbit { display: none; } .branch-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 16px; } }
 .read-panel { padding: 30px; display: flex; flex-direction: column; gap: 16px; }
@@ -218,6 +218,10 @@ section { scroll-margin-top: 24px; }
   .dad-step { padding: 30px 0; }
   .dad-caption { font-size: 11.5px; letter-spacing: .06em; }
 }
+
+/* Readability floor: the orbit shrinks in the two-column reader, so its branch numbers grow there.
+   The centre caption keeps 12px: it sits on a 112-unit chord of the centre circle and larger text crosses the circle. */
+@media (min-width: 980px) and (max-width: 1199px) { .o-num { font-size: 14.5px; } }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

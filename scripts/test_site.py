@@ -155,6 +155,54 @@ def check_search_states(html: str, app_text: str, css: str) -> list[str]:
     return errors
 
 
+# Readability floor: visible labels stay at about 11px (.68rem = 10.88px) or larger.
+FLOOR_PX = 10.88
+# The one deliberate exception: mobile map axis ticks are centred on the fixed y-axis gutter
+# (test_map_geometry: "mobile y-axis gutter"); larger ticks cross the plot frame. Their words stay
+# readable in the HTML map key and axis captions. The orbit centre caption ("published 2022") is
+# likewise bounded by the centre circle's chord, so it stays at 12px in SVG units.
+FLOOR_EXCEPTIONS = {("web/styles.css", ".axis-label", "10px")}
+FLOOR_SELECTORS = [".mini-label", ".node-sublabel", ".band-badge", ".source-link small", ".source-claim-id",
+                   ".map-key-item small", ".axis-label", ".axis-caption", ".hero-principles span", ".category-tag",
+                   ".receipt-label", ".principle span", ".trust-pillars span", ".legend", ".resolution-label"]
+
+
+def css_rules(path: Path):
+    css = re.sub(r"/\*.*?\*/", "", path.read_text(encoding="utf-8"), flags=re.S)
+    for m in re.finditer(r"([^{}]+)\{([^{}]*)\}", css):
+        yield m.group(1).strip().splitlines()[-1].strip(), m.group(2)
+
+
+def check_readability_floor() -> list[str]:
+    errors: list[str] = []
+    seen: set[str] = set()
+    for rel in ("web/styles.css", "web/explore.css"):
+        for selector, body in css_rules(ROOT / rel):
+            for decl in re.findall(r"font(?:-size)?\s*:\s*([^;]+)", body):
+                for num, unit in re.findall(r"(\d*\.?\d+)(rem|px)\b", decl):
+                    size = float(num) * (16 if unit == "rem" else 1)
+                    if size < FLOOR_PX and (rel, selector, f"{num}{unit}") not in FLOOR_EXCEPTIONS:
+                        errors.append(f"readability floor: {rel} {selector} uses {num}{unit} (< {FLOOR_PX}px)")
+            seen.update(s.strip() for s in selector.split(","))
+    for selector in FLOOR_SELECTORS:
+        if selector not in seen:
+            errors.append(f"readability floor: guarded selector {selector} not found")
+    styles = (ROOT / "web/styles.css").read_text(encoding="utf-8")
+    explore = (ROOT / "web/explore.css").read_text(encoding="utf-8")
+    # SVG text scales with its viewBox; these rules keep it near 11px where each drawing shrinks.
+    svg_rules = [
+        (styles, r"@media \(min-width: 651px\) and \(max-width: 1199px\) \{[^@]*\.axis-label \{ font-size:13\.8px", "desktop map axis labels 13.8px (651–1199)"),
+        (styles, r"@media \(min-width: 651px\) and \(max-width: 1199px\) \{[^@]*\.node-sublabel \{ font-size:14px", "desktop map sublabels 14px (651–1199)"),
+        (styles, r"@media \(max-width: 650px\) \{ \.node-index \{ font-size:12\.5px", "mobile map indices 12.5px"),
+        (explore, r"@media \(min-width: 980px\) and \(max-width: 1199px\) \{ \.o-num \{ font-size: 14\.5px", "orbit branch numbers 14.5px (980–1199)"),
+        (explore, r"\.o-csub \{ font: 400 12px", "orbit centre caption 12px (largest size inside the centre circle)"),
+    ]
+    for source, pattern, label in svg_rules:
+        if not re.search(pattern, source):
+            errors.append(f"readability floor: missing SVG scaling rule for {label}")
+    return errors
+
+
 def main() -> int:
     html_path = WEB / "index.html"
     text = html_path.read_text(encoding="utf-8")
@@ -224,6 +272,7 @@ def main() -> int:
             errors.append("centered spine overridden by a later left-aligned rule")
 
     errors.extend(check_search_states(text, app_text, css))
+    errors.extend(check_readability_floor())
 
     if errors:
         print("SITE TEST: FAIL")

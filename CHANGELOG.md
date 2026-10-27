@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.0 — 2026-10-27
+
+- Added source-aware search with five states: reviewed record, broader reviewed record, published 2022 community source, later supplied image, and not mapped in this release. An exact reviewed record and a broader reviewed relationship (for example, Weightlifting → Physical activity) each open the reviewed record. Source-only terms explain their source state without offering a record action.
+- Kept the published 2022 analysis and the later supplied image as separate source states in search. "Not mapped in this release" means not mapped by this product, not absent from any upstream source.
+- Added a "What the data says about itself" evidence-literacy section to the guided reading, recomputed from the published 2022 result table and plotting code:
+  - 125 result-table items become 116 plotted.
+  - Rating volume and modeled life-changing probability have only a weak rank relationship across the plotted items (Spearman ρ ≈ 0.14).
+  - Median model intervals are about four times wider for sparsely rated plotted items than for widely rated ones.
+  - Precision is not validity: more ratings narrow an estimate but do not add randomization, blinding, placebo control, representative sampling, or causal inference.
+- Raised small visible labels across the evidence map, receipts, and guided reading to a readability floor of about 11px without changing map geometry. Two geometry-bound labels keep their size: the mobile map axis ticks, whose words also appear in the map key and axis captions, and the guided-reading orbit's centre caption, which must fit inside its circle.
+- Imported no upstream raw community dataset and changed no reviewed evidence record. Search context is a small curated list of names with no counts, coordinates, or rankings.
+- Added regression coverage for the five search states, data-about-data figures and source attribution, and the readability floor.
+
 ## 0.2.0 — 2026-10-27
 
 - Added a guided-reading page (`explore.html`) that explains the community Nootroflix chart in 47 ideas across eight branches, with simple and detailed reading depth and keyboard navigation.
