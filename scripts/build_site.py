@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 WEB = ROOT / "web"
 DATA = ROOT / "data"
 OUT = ROOT / "_site"
-ASSETS = ["index.html", "styles.css", "app.js", "404.html", "favicon.svg"]
+ASSETS = ["index.html", "styles.css", "app.js", "404.html", "favicon.svg", "social-preview.png"]
 
 
 def main() -> int:

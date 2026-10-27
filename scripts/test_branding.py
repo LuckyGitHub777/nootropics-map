@@ -34,14 +34,22 @@ def main() -> int:
         errors.append("web title missing")
     if 'content="Nootropics Map"' not in index:
         errors.append("Open Graph product title missing")
+    canonical = "https://luckygithub777.github.io/nootropics-map/"
+    if f'rel="canonical" href="{canonical}"' not in index:
+        errors.append("canonical Pages URL missing from page head")
+    if f'property="og:url" content="{canonical}"' not in index:
+        errors.append("Open Graph canonical URL missing")
+    if "social-preview.png" not in index:
+        errors.append("social preview metadata missing")
     app = (ROOT / "web" / "app.js").read_text(encoding="utf-8")
     styles = (ROOT / "web" / "styles.css").read_text(encoding="utf-8")
     if 'id="mapKey"' not in index or "compactOffsets" not in app or ".map-key-item" not in styles:
         errors.append("responsive mobile map key/collision treatment missing")
     prohibited_exts = {".jpg", ".jpeg", ".png", ".webp"}
-    images = [p.relative_to(ROOT) for p in ROOT.rglob("*") if p.is_file() and p.suffix.lower() in prohibited_exts]
-    if images:
-        errors.append(f"unexpected raster image(s) in release tree: {images}")
+    images = {p.relative_to(ROOT) for p in ROOT.rglob("*") if p.is_file() and p.suffix.lower() in prohibited_exts}
+    allowed_images = {Path("web/social-preview.png")}
+    if images != allowed_images:
+        errors.append(f"raster release boundary mismatch: expected {sorted(map(str, allowed_images))}, found {sorted(map(str, images))}")
 
 
 

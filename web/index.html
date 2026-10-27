@@ -8,13 +8,21 @@
   <meta name="theme-color" content="#0a0a09" />
   <meta name="robots" content="index,follow" />
   <meta name="application-name" content="Nootropics Map" />
+  <link rel="canonical" href="https://luckygithub777.github.io/nootropics-map/" />
   <meta property="og:title" content="Nootropics Map" />
   <meta property="og:description" content="What changes the mind? See the signal. Trace the evidence." />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Nootropics Map" />
-  <meta name="twitter:card" content="summary" />
+  <meta property="og:url" content="https://luckygithub777.github.io/nootropics-map/" />
+  <meta property="og:image" content="https://luckygithub777.github.io/nootropics-map/social-preview.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Nootropics Map — What changes the mind? Follow the evidence." />
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Nootropics Map" />
   <meta name="twitter:description" content="What changes the mind? See the signal. Trace the evidence." />
+  <meta name="twitter:image" content="https://luckygithub777.github.io/nootropics-map/social-preview.png" />
+  <meta name="twitter:image:alt" content="Nootropics Map — What changes the mind? Follow the evidence." />
   <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
   <title>Nootropics Map</title>
   <link rel="stylesheet" href="./styles.css" />
@@ -29,7 +37,7 @@
     </a>
     <div class="header-actions">
       <button class="ghost-button" id="methodButton" type="button">Method</button>
-      <button class="trust-button" id="trustButton" type="button">Why trust this?</button>
+      <button class="trust-button" id="trustButton" type="button" aria-label="Why trust this?"><span class="trust-label-full">Why trust this?</span><span class="trust-label-short" aria-hidden="true">Trust</span></button>
     </div>
   </header>
 
@@ -67,11 +75,11 @@
       </div>
 
       <div class="filter-row" role="toolbar" aria-label="Filter interventions">
-        <button class="filter-chip active" data-category="all" type="button">All</button>
-        <button class="filter-chip" data-category="behavior" type="button">Behavior</button>
-        <button class="filter-chip" data-category="exercise" type="button">Exercise</button>
-        <button class="filter-chip" data-category="environment" type="button">Environment</button>
-        <button class="filter-chip" data-category="nutrition" type="button">Nutrition</button>
+        <button class="filter-chip active" data-category="all" type="button" aria-pressed="true">All</button>
+        <button class="filter-chip" data-category="behavior" type="button" aria-pressed="false">Behavior</button>
+        <button class="filter-chip" data-category="exercise" type="button" aria-pressed="false">Exercise</button>
+        <button class="filter-chip" data-category="environment" type="button" aria-pressed="false">Environment</button>
+        <button class="filter-chip" data-category="nutrition" type="button" aria-pressed="false">Nutrition</button>
       </div>
 
       <div class="atlas-grid">
@@ -79,7 +87,7 @@
           <div class="map-header">
             <div>
               <span class="mini-label">MAP VIEW</span>
-              <strong id="mapStatus">All evidence records</strong>
+              <strong id="mapStatus" role="status" aria-live="polite" aria-atomic="true">All evidence records</strong>
             </div>
             <div class="legend" aria-label="Evidence legend">
               <span><i class="legend-dot emerging"></i> Emerging</span>
@@ -119,8 +127,8 @@
           <h2 id="library-title">Understand first. Inspect second.</h2>
         </div>
         <div class="view-toggle" aria-label="Detail level">
-          <button type="button" class="view-option active" data-view="simple">Simple</button>
-          <button type="button" class="view-option" data-view="detailed">Detailed</button>
+          <button type="button" class="view-option active" data-view="simple" aria-pressed="true">Simple</button>
+          <button type="button" class="view-option" data-view="detailed" aria-pressed="false">Detailed</button>
         </div>
       </div>
       <div id="cardGrid" class="card-grid" aria-live="polite"></div>
