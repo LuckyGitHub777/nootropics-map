@@ -24,6 +24,12 @@
 
   const claimById = (id) => state.claims.find((item) => item.id === id);
   const sourceById = (id) => state.sources.find((item) => item.id === id);
+  const itemBySlug = (slug) => state.interventions.find((item) => item.slug === slug);
+  const hashSlug = () => {
+    try { return decodeURIComponent(window.location.hash.replace(/^#/, '')); }
+    catch { return ''; }
+  };
+  let syncingLocation = false;
   const confidenceFor = (item) => {
     const claims = item.claim_ids.map(claimById).filter(Boolean);
     if (!claims.length) return 'unknown';
@@ -211,7 +217,7 @@
       : `${items.length} matching record${items.length === 1 ? '' : 's'}`;
   }
 
-  function openDetail(item) {
+  function openDetail(item, updateLocation = true) {
     const claims = item.claim_ids.map(claimById).filter(Boolean);
     const sourceIds = [...new Set(claims.flatMap((claim) => claim.source_ids))];
     const sources = sourceIds.map(sourceById).filter(Boolean);
@@ -256,7 +262,27 @@
         <span class="receipt-label">Sources</span>
         <div class="source-list">${sourceHtml}</div>
       </section>`;
-    $('#detailDialog').showModal();
+    const dialog = $('#detailDialog');
+    if (updateLocation) {
+      const targetHash = `#${encodeURIComponent(item.slug)}`;
+      if (window.location.hash !== targetHash) {
+        history.pushState({ nootropicsMapDetail: item.slug }, '', targetHash);
+      }
+    }
+    if (!dialog.open) dialog.showModal();
+  }
+
+  function syncDetailFromLocation() {
+    const slug = hashSlug();
+    const item = itemBySlug(slug);
+    const dialog = $('#detailDialog');
+    if (item) {
+      openDetail(item, false);
+    } else if (dialog.open) {
+      syncingLocation = true;
+      dialog.close();
+      syncingLocation = false;
+    }
   }
 
   function update() {
@@ -278,18 +304,40 @@
 
     $$('.filter-chip').forEach((button) => button.addEventListener('click', () => {
       state.category = button.dataset.category;
-      $$('.filter-chip').forEach((chip) => chip.classList.toggle('active', chip === button));
+      $$('.filter-chip').forEach((chip) => {
+        const active = chip === button;
+        chip.classList.toggle('active', active);
+        chip.setAttribute('aria-pressed', String(active));
+      });
       update();
     }));
 
     $$('.view-option').forEach((button) => button.addEventListener('click', () => {
       state.view = button.dataset.view;
-      $$('.view-option').forEach((option) => option.classList.toggle('active', option === button));
+      $$('.view-option').forEach((option) => {
+        const active = option === button;
+        option.classList.toggle('active', active);
+        option.setAttribute('aria-pressed', String(active));
+      });
       renderCards();
     }));
 
     $('#trustButton').addEventListener('click', () => $('#trustDialog').showModal());
     $('#methodButton').addEventListener('click', () => $('#methodDialog').showModal());
+
+    const detailDialog = $('#detailDialog');
+    detailDialog.addEventListener('close', () => {
+      if (syncingLocation) return;
+      const slug = hashSlug();
+      if (!slug || !itemBySlug(slug)) return;
+      if (history.state?.nootropicsMapDetail === slug) {
+        history.back();
+      } else {
+        history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
+      }
+    });
+    window.addEventListener('popstate', syncDetailFromLocation);
+    window.addEventListener('hashchange', syncDetailFromLocation);
 
     const compactQuery = window.matchMedia('(max-width: 650px)');
     compactQuery.addEventListener('change', () => renderMap());
@@ -313,6 +361,7 @@
         : '—';
       bindEvents();
       update();
+      syncDetailFromLocation();
     } catch (error) {
       console.error(error);
       $('#cardGrid').innerHTML = '<p class="empty-state">Evidence data could not be loaded. Serve the repository over HTTP rather than opening the file directly.</p>';

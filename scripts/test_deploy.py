@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Build and verify the exact artifact intended for GitHub Pages."""
 from __future__ import annotations
+import html as html_lib
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -18,7 +20,7 @@ def fail(message: str) -> int:
 def main() -> int:
     subprocess.run([sys.executable, str(ROOT / "scripts" / "build_site.py")], check=True)
     required = [
-        "index.html", "styles.css", "app.js", "404.html", "favicon.svg", ".nojekyll",
+        "index.html", "styles.css", "app.js", "404.html", "favicon.svg", "social-preview.png", ".nojekyll",
         "data/interventions.json", "data/claims.json", "data/sources.json",
     ]
     missing = [p for p in required if not (OUT / p).exists()]
@@ -33,6 +35,12 @@ def main() -> int:
         return fail("built app has no root-relative data fetches")
     if 'id="reviewDate"' not in html:
         return fail("review-date element missing")
+    visible = " ".join(html_lib.unescape(re.sub(r"<[^>]+>", " ", html)).split())
+    if "What changes the mind? Follow the evidence." not in visible:
+        return fail("visible hero copy mismatch")
+    canonical = "https://luckygithub777.github.io/nootropics-map/"
+    if f'rel="canonical" href="{canonical}"' not in html or "social-preview.png" not in html:
+        return fail("canonical/share metadata missing")
     if 'href="/' in html or 'src="/' in html or "href='/" in html or "src='/" in html:
         return fail("root-absolute asset path found; project Pages path would break")
 

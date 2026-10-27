@@ -5,6 +5,9 @@
 - Promoted the fully verified rc.6 candidate to the first public release.
 - Preserved the source-backed evidence model, responsive map geometry, safety boundaries, and reproducible Pages deployment.
 - Completed private PR/CI verification before publication.
+- Completed production UX closeout with mobile methodology parity, accessible toggle states, shareable intervention links, and canonical social metadata.
+- Added a first-party social preview while preserving the third-party-image exclusion boundary.
+- Hardened hosted verification to validate visible hero copy and the exact deployable artifact.
 
 ## 0.1.0-rc.6 — 2026-10-27
 

@@ -42,7 +42,7 @@ def main() -> int:
     text = html_path.read_text(encoding="utf-8")
     parser = Inspector(); parser.feed(text)
     errors = []
-    required_ids = {"searchInput", "evidenceMap", "cardGrid", "detailDialog", "trustDialog", "methodDialog", "reviewDate", "mapKey"}
+    required_ids = {"searchInput", "evidenceMap", "cardGrid", "detailDialog", "trustDialog", "methodDialog", "reviewDate", "mapKey", "mapStatus", "methodButton", "trustButton"}
     missing = required_ids - parser.ids
     if missing: errors.append(f"missing required IDs: {sorted(missing)}")
     if parser.lang != "en": errors.append("html lang must be en")
@@ -56,6 +56,23 @@ def main() -> int:
         errors.append("reduced-motion support missing")
     if "aria-live" not in text:
         errors.append("dynamic evidence grid should expose aria-live")
+    if 'id="mapStatus" role="status" aria-live="polite"' not in text:
+        errors.append("map result status should be politely announced")
+    if text.count('aria-pressed="') < 7:
+        errors.append("filter/detail toggles should expose aria-pressed state")
+    canonical = 'https://luckygithub777.github.io/nootropics-map/'
+    if f'rel="canonical" href="{canonical}"' not in text:
+        errors.append("canonical Pages URL missing")
+    if f'property="og:url" content="{canonical}"' not in text:
+        errors.append("Open Graph URL missing")
+    if 'social-preview.png' not in text or not (WEB / "social-preview.png").exists():
+        errors.append("first-party social preview missing")
+    app_text = (WEB / "app.js").read_text(encoding="utf-8")
+    for token in ("history.pushState", "syncDetailFromLocation", "popstate", "hashchange"):
+        if token not in app_text:
+            errors.append(f"deep-link contract missing: {token}")
+    if ".ghost-button { display:none; }" in (WEB / "styles.css").read_text(encoding="utf-8"):
+        errors.append("mobile Method control must remain available")
     if not parser.dialogs:
         errors.append("detail dialogs missing")
     if not (WEB / "favicon.svg").exists():
