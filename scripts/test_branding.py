@@ -24,8 +24,8 @@ def main() -> int:
 
     if package.get("name") != "nootropics-map":
         errors.append("package name must be nootropics-map")
-    if package.get("version") != "0.1.0-rc.6":
-        errors.append("package version must match rc.6")
+    if package.get("version") != "0.1.0":
+        errors.append("package version must match 0.1.0")
     if not readme.startswith("# Nootropics Map"):
         errors.append("README title must be Nootropics Map")
     if "https://luckygithub777.github.io/nootropics-map/" not in domain:
