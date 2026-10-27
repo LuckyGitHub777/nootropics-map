@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.0 — 2026-10-27
+
+- Promoted the fully verified rc.6 candidate to the first public release.
+- Preserved the source-backed evidence model, responsive map geometry, safety boundaries, and reproducible Pages deployment.
+- Completed private PR/CI verification before publication.
+
 ## 0.1.0-rc.6 — 2026-10-27
 
 - Moved the mobile x-axis caption into normal document flow directly beneath the chart and above the interactive map key.
