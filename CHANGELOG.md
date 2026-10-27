@@ -8,6 +8,7 @@
 - Completed production UX closeout with mobile methodology parity, accessible toggle states, shareable intervention links, and canonical social metadata.
 - Added a first-party social preview while preserving the third-party-image exclusion boundary.
 - Hardened hosted verification to validate visible hero copy and the exact deployable artifact.
+- Normalized generated text artifacts to canonical LF so Pages builds are byte-reproducible across Windows and Linux.
 
 ## 0.1.0-rc.6 — 2026-10-27
 
