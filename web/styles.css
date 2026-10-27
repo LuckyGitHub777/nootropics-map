@@ -314,3 +314,22 @@ footer { width:min(1180px, calc(100% - 40px)); margin:0 auto; border-top:1px sol
   .hero-principles { gap: .35rem; }
   .hero-principles span { font-size: .61rem; }
 }
+
+/* Centered spine: Explore, Evidence Library and Trust Architecture read around one centered axis at every width. */
+.section-heading { flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:1rem; }
+.section-heading > div:not(.view-toggle) { display:grid; justify-items:center; }
+.section-note { max-width:560px; margin:0 auto; text-align:center; }
+.filter-row { justify-content:center; }
+.view-toggle { justify-content:center; }
+.trust-strip { grid-template-columns:minmax(0,1fr); justify-items:center; text-align:center; gap:2.25rem; }
+.trust-pillars { width:100%; max-width:960px; grid-template-columns:repeat(4, minmax(0,1fr)); }
+.trust-pillars > div { text-align:center; }
+.card-grid { display:flex; flex-wrap:wrap; justify-content:center; }
+.card-grid > .evidence-card { flex:0 1 calc((100% - 2rem) / 3); }
+@media (max-width: 900px) {
+  .card-grid > .evidence-card { flex-basis:calc((100% - 1rem) / 2); }
+}
+@media (max-width: 650px) {
+  .trust-pillars { grid-template-columns:repeat(2, minmax(0,1fr)); }
+  .card-grid > .evidence-card { flex-basis:100%; }
+}

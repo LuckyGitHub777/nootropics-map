@@ -78,6 +78,33 @@ def main() -> int:
     if not (WEB / "favicon.svg").exists():
         errors.append("favicon missing")
 
+    # Centered spine: Explore, Evidence Library and Trust Architecture stay on one centered axis.
+    css = (WEB / "styles.css").read_text(encoding="utf-8")
+    marker = "/* Centered spine:"
+    if marker not in css:
+        errors.append("centered-spine stylesheet block missing")
+    else:
+        spine = css[css.index(marker):]
+        required = {
+            ".section-heading": ["align-items:center", "text-align:center"],
+            ".section-note": ["text-align:center"],
+            ".filter-row": ["justify-content:center"],
+            ".trust-strip": ["grid-template-columns:minmax(0,1fr)", "justify-items:center", "text-align:center"],
+            ".trust-pillars > div": ["text-align:center"],
+        }
+        for selector, declarations in required.items():
+            rule = re.search(re.escape(selector) + r"\s*\{([^}]*)\}", spine)
+            body = rule.group(1).replace(" ", "") if rule else ""
+            for declaration in declarations:
+                if declaration not in body:
+                    errors.append(f"centered spine lost: {selector} needs {declaration}")
+        if ".section-heading > div:not(.view-toggle)" not in spine or re.search(r"\.section-heading\s*>\s*div\s*\{", spine):
+            errors.append("centered heading rule must not restyle the Simple/Detailed toggle")
+        if not re.search(r"\.card-grid\s*\{[^}]*justify-content:\s*center", spine):
+            errors.append("evidence card rows must wrap toward the center")
+        if re.search(r"text-align\s*:\s*(left|start)|align-items\s*:\s*flex-start", spine):
+            errors.append("centered spine overridden by a later left-aligned rule")
+
     if errors:
         print("SITE TEST: FAIL")
         for e in errors: print(f" - {e}")
