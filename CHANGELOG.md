@@ -7,6 +7,12 @@
 - The page reads every reviewed claim and source from `data/*.json`; no evidence is duplicated in page code.
 - Kept the community-signal layer out of the product until a provenance-complete dataset exists; the page describes the chart in words without reproducing its placements or naming high-risk substances.
 - Linked the evidence map header to the guided reading and added regression coverage for structure, data sourcing, the 47-idea reading, palette parity, and the safety boundary.
+- Separated the published 2022 analysis (36,163 ratings, 2,802 people, 125-item result table, 116 plotted items) from a later supplied chart image whose dataset is not published; Doing Math and the negative y-axis tick are attributed only to the later image.
+- Corrected source-chart wording: exact 300-rating and 2% thresholds from the published code, low double-digit minimum counts, published uncertainty intervals, and the separate side-effect field.
+- Framed creatine as different questions (cognitive self-report versus a strength and power claim), not a disagreement.
+- Centered the Explore, Evidence Library, and Trust Architecture sections on one visual spine at every width.
+- Documented the community-data reuse boundary in `docs/source-policy.md`; no upstream raw community data is redistributed.
+- Added regression checks for source-state separation, stale wording, cross-project terminology, and centered layout.
 
 ## 0.1.0 — 2026-10-27
 
