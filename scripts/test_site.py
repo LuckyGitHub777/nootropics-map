@@ -40,7 +40,9 @@ CONTEXT_LEAKS = ["the chart changed", "two snapshots", "about the two snapshots"
                  "separate later image", "separate image", "another image", "later chart", "later dataset",
                  "another dataset", "other dataset", "set of data", "chart version", "underlying data is unavailable",
                  "underlying data unavailable", "which figures can be checked", "a later image includes",
-                 "data about the data", "inclusion filter", "not every result is plotted"]
+                 "data about the data", "inclusion filter", "not every result is plotted",
+                 # Informational voice: describe the information, do not editorialize or instruct.
+                 "community signal", "different story", "check the evidence"]
 # Analytics that only make sense against one particular underlying result-table state stay off the page.
 SOURCE_STATE_ANALYTICS = [r"36,163", r"2,802", r"(?<![\d,.])125(?![\d,])", r"(?<![\d,.])116(?![\d,])", r"ρ", r"≈\s*4×", r"≈\s*3\.9×",
                           r"<\s*50 ratings", r"500\+ ratings", r"0\.048", r"(?<![\d.])0\.012"]
@@ -62,9 +64,10 @@ CITED = {
 }
 # Observations read directly from the chart, qualitative and in this order.
 INSIGHT_HEADINGS = ["Behaviors appear alongside compounds", "Popularity and reported impact are different",
-                    "Common does not mean life-changing", "The chart is community signal", "Evidence can tell a different story"]
+                    "Common does not mean life-changing", "The chart summarizes reported experience",
+                    "Scientific evidence answers a different question"]
 INSIGHT_FACTS = ["Weightlifting, sleep, meditation and Doing Math appear in the same landscape as supplements and other interventions.",
-                 "The positions summarize reported experience. They do not establish efficacy, causation or safety."]
+                 "Positions reflect how people rated their own experience. They do not establish efficacy, causation or safety."]
 
 
 class Inspector(HTMLParser):
@@ -288,6 +291,8 @@ def check_copy(html: str, app: str) -> list[str]:
         shown = json.dumps(json.loads((ROOT / "data" / name).read_text(encoding="utf-8")), ensure_ascii=False)
         if SECOND_PERSON.search(shown):
             errors.append(f"data/{name} addresses the reader")
+    if not re.search(r'<h1 id="hero-title">What changes the mind\?</h1>', html) or 'id="evidence-title">Reviewed evidence</h2>' not in html:
+        errors.append("hero and evidence headings must be the plain informational versions")
     for label in ["Life-changing probability", "Five things that stand out", "Selected items from the community chart",
                   "Life-changing probability is the modeled share of ratings at the top of the scale"]:
         if label not in page:
@@ -375,10 +380,10 @@ def check_context(html: str, app: str) -> list[str]:
     for phrase in CONTEXT_REQUIRED:
         if phrase not in surface:
             errors.append(f"unified chart wording missing: {phrase!r}")
-    # A bibliographic year may appear inside a source citation, never as a framing of the information.
-    framing = public_surface(re.sub(r'<ul class="source-list".*?</ul>', " ", html, flags=re.S)) + " " + js_user_strings(app)
+    # The chart is not framed by year anywhere on the page, citations included; linked sources carry their own dates.
+    framing = public_surface(html) + " " + js_user_strings(app)
     if re.search(r"\b2022\b", framing):
-        errors.append("the information must not be framed by year outside a source citation")
+        errors.append("the chart must not be framed by year on the public page")
     for pattern in SOURCE_STATE_ANALYTICS:
         if re.search(pattern, framing):
             errors.append(f"source-state analytic on the public page: {pattern!r}")
