@@ -1,58 +1,134 @@
 #!/usr/bin/env python3
-"""Lightweight static-site integrity and accessibility smoke checks."""
+"""Structure, copy, data-fidelity, search and readability checks for the single public page."""
 from __future__ import annotations
+import html as html_lib
 import json
 import re
 import shutil
 import subprocess
 import sys
-from pathlib import Path
 from html.parser import HTMLParser
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 WEB = ROOT / "web"
+CANONICAL = "https://luckygithub777.github.io/nootropics-map/"
+SECTION_ORDER = ["map", "insights", "snapshots", "data", "evidence", "sources"]
+NAV = [("#map", "Map"), ("#insights", "Insights"), ("#evidence", "Evidence"), ("#sources", "Sources")]
+REQUIRED_IDS = {"communityMap", "mapKey", "mapKeyBody", "searchInput", "searchResolution", "searchAnnounce", "evidenceList",
+                "emptyState", "detailDialog", "dialogContent", "reviewedSources", "reviewNote", *SECTION_ORDER}
+HIGH_RISK_NAMES = ["cocaine", "fentanyl", "mdma", "adderall", "alprazolam", "epobis", "dihexa", "isrib", "semax", "modafinil", "phenibut"]
+SAFETY_LINE = "Information only. Not medical advice. No diagnosis, treatment, dosing, or personal recommendations."
+# Visitor-facing copy explains the subject, not the product, and does not address the reader.
+BANNED_PHRASES = ["system of record", "git", "pull request", "required check", "ci ", "build", "versioned", "versionable",
+                  "north star", "trust architecture", "why trust", "trust the trace", "front door", "v0.", "in this release",
+                  "guided reading", "talk to a clinician", "clinician", "receipt", "pathway",
+                  # Undefined scale jargon and over-broad provenance claims.
+                  "chance of a 10", "of a 10", "rarely a 10", "often a 10", "every number on this page"]
+SECOND_PERSON = re.compile(r"\b(you|your|yours|yourself)\b", re.I)
+
+# Published 2022 community analysis: the seven cited values (result table, verified 2026-10-28 against
+# results_summary.csv in the published analysis repository). Not a dataset; a small attributed citation set.
+CITED = {
+    "Weightlifting": (567, 0.121, 0.093, 0.153),
+    "Trying to get more sleep": (993, 0.075, 0.060, 0.093),
+    "Meditation": (429, 0.066, 0.046, 0.093),
+    "Caffeine": (2553, 0.030, 0.025, 0.037),
+    "Creatine": (1153, 0.014, 0.010, 0.020),
+    "Theanine": (1322, 0.013, 0.009, 0.018),
+    "Omega-3": (956, 0.010, 0.006, 0.014),
+}
+# Facts stated in the insights, each derived from the citation set or the published plotting code.
+INSIGHT_FACTS = ["top ten of 125 items", "Weightlifting ranks third", "Third of 125 items at 0.121", "2,553 ratings",
+                 "more than any other item", "0.030", "956 to 1,322 ratings", "ρ ≈ 0.14", "fewer than 50 ratings", "about four times wider",
+                 "500 or more", "Doing Math", "The chart changed."]
+DATA_FACTS = ["125", "116", "125 result-table items · 116 plotted", "ρ ≈ 0.14", "Popularity barely tracks reported transformation.",
+              "≈4×", "≈0.048", "≈0.012", "≈3.9×", "Sparse estimates are much less precise.", "20 items in each group",
+              "More ratings improve precision. They do not turn self-report into an experiment."]
+
 
 class Inspector(HTMLParser):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.ids = set()
-        self.scripts = []
-        self.styles = []
+        self.ids: list[str] = []
+        self.scripts: list[str] = []
+        self.styles: list[str] = []
         self.lang = None
-        self.inputs = []
-        self.dialogs = []
         self.h1 = 0
+        self.nav: list[tuple[str, str]] = []
+        self._in_nav = False
+        self._href = None
+        self.visible: list[str] = []
+        self._skip = 0
+        self._sr = 0
+        self._stack: list[str] = []
+
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
         if "id" in a:
-            self.ids.add(a["id"])
-        if tag == "html": self.lang = a.get("lang")
-        if tag == "script" and a.get("src"): self.scripts.append(a["src"])
-        if tag == "link" and a.get("rel") == "stylesheet": self.styles.append(a.get("href"))
-        if tag == "input": self.inputs.append(a)
-        if tag == "dialog": self.dialogs.append(a)
-        if tag == "h1": self.h1 += 1
+            self.ids.append(a["id"])
+        if tag == "html":
+            self.lang = a.get("lang")
+        if tag == "h1":
+            self.h1 += 1
+        if tag == "script" and a.get("src"):
+            self.scripts.append(a["src"])
+        if tag == "link" and a.get("rel") == "stylesheet":
+            self.styles.append(a.get("href", ""))
+        if tag == "nav":
+            self._in_nav = True
+        if self._in_nav and tag == "a":
+            self._href = a.get("href")
+        if tag in ("script", "style", "head", "title", "svg", "dialog"):
+            self._skip += 1
+        if "sr-only" in (a.get("class") or "").split():
+            self._sr += 1
+            self._stack.append(tag)
+
+    def handle_endtag(self, tag):
+        if tag == "nav":
+            self._in_nav = False
+        if tag in ("script", "style", "head", "title", "svg", "dialog"):
+            self._skip -= 1
+        if self._stack and self._stack[-1] == tag:
+            self._stack.pop()
+            self._sr -= 1
+
+    def handle_data(self, data):
+        if self._in_nav and self._href and data.strip():
+            self.nav.append((self._href, data.strip()))
+            self._href = None
+        if not self._skip and not self._sr and data.strip():
+            self.visible.append(data.strip())
 
 
-def local_ref_exists(ref: str) -> bool:
-    if not ref or ref.startswith(("http://", "https://", "//", "#")):
-        return True
-    return (WEB / ref).resolve().exists()
+def js_user_strings(app: str) -> str:
+    """Quoted strings in app.js that can reach the page (excludes selectors, ids and code-only tokens)."""
+    strings = re.findall(r"'([^'\\\n]{4,})'|`([^`]{4,})`", app)
+    out = [a or b for a, b in strings]
+    return " ".join(s for s in out if " " in s and not s.startswith(("#", ".", "http", "(max-width", "translate(")))
 
 
-HIGH_RISK_NAMES = ["cocaine", "fentanyl", "mdma", "adderall", "alprazolam", "epobis", "dihexa", "isrib", "semax", "modafinil", "phenibut"]
+HARNESS = r"""
+const interventions = JSON.parse(process.argv[1]);
+const cases = JSON.parse(process.argv[2]);
+console.log(JSON.stringify(cases.map((q) => {
+  const result = resolveSearch(q, interventions);
+  const view = describeResolution(result);
+  return { q, state: result.state, view, actions: view ? view.actions.map((a) => a.slug) : [] };
+})));
+"""
 
-# Durable five-state search contract. Each case: query, expected state, expected strings, forbidden strings.
+# Durable five-state search contract: query, state, required wording, forbidden wording.
 SEARCH_MATRIX = [
-    ("Creatine", "reviewed", ["Reviewed record", "Creatine", "authoritative"], []),
-    ("Weightlifting", "broader", ["Broader reviewed record", "Closest reviewed record: Physical activity", "broader than the searched term"],
-     ["agree", "disagree", "confirm", "contradict"]),
-    ("Caffeine", "published-2022", ["Published 2022 community source", "no reviewed Nootropics Map record", "self-reported", "not evidence of efficacy or safety"], []),
-    ("Doing Math", "later-image", ["Later supplied image", "separate from the published 2022 analysis", "has not been published"],
-     ["36,163", "2,802", "36163", "2802", "rating"]),
-    ("Charlie Sheen", "not-mapped", ["Not mapped in this release", "not a complete inventory of the upstream dataset"],
-     ["not in the source", "not in the 2022 dataset", "does not exist", "no evidence exists"]),
-    # Normalization, partial matching and precedence.
+    ("Creatine", "reviewed", ["Reviewed", "Creatine", "claim, limitations and sources", "Different questions."], []),
+    ("Weightlifting", "broader", ["Related evidence", "Physical activity", "broader than the searched term"], ["agree", "confirm", "contradict"]),
+    ("Caffeine", "published-2022", ["2022 chart", "published 2022 community analysis", "No reviewed record", "not evidence of efficacy or safety"], []),
+    ("Omega-3", "published-2022", ["2022 chart", "Omega-3"], []),
+    ("Doing Math", "later-image", ["Later image", "later supplied image", "separate from the published 2022 analysis", "undocumented"],
+     ["36,163", "2,802", "rating", "0."]),
+    ("Charlie Sheen", "not-mapped", ["Not in the current index", "not a complete inventory of the upstream dataset"],
+     ["not in the source", "does not exist", "no evidence exists", "release"]),
     ("  cReAtInE  ", "reviewed", ["Creatine"], []),
     ("creat", "reviewed", ["Creatine"], []),
     ("WEIGHT", "broader", ["Physical activity"], []),
@@ -66,220 +142,255 @@ SEARCH_MATRIX = [
     ("<img src=x onerror=alert(1)>", "not-mapped", ["“<img src=x onerror=alert(1)>”"], []),
 ]
 
-HARNESS = r"""
-const interventions = JSON.parse(process.argv[1]);
-const cases = JSON.parse(process.argv[2]);
-const out = cases.map((q) => {
-  const result = resolveSearch(q, interventions);
-  const view = describeResolution(result);
-  return { q, state: result.state, view, actions: view ? view.actions.map((a) => a.slug) : [] };
-});
-console.log(JSON.stringify(out));
-"""
 
-
-def check_search_states(html: str, app_text: str, css: str) -> list[str]:
+def check_search(html: str, app: str) -> list[str]:
     errors: list[str] = []
     start, end = "// search-resolution:start", "// search-resolution:end"
-    if start not in app_text or end not in app_text:
+    if start not in app or end not in app:
         return ["search-resolution block markers missing from app.js"]
-    block = app_text[app_text.index(start):app_text.index(end)]
-
-    # The resolver is navigation metadata: never a dataset, never quantitative, never innerHTML.
-    if "innerHTML" in block:
-        errors.append("search resolution must not build markup from strings")
-    if re.search(r"\d{2,}[,.]\d|\b(count|ratings?|proba|p10|x:|y:)\s*:", block):
+    block = app[app.index(start):app.index(end)]
+    if "innerHTML" in block or "fetch(" in block:
+        errors.append("search resolution must not build markup from strings or load data")
+    if re.search(r"\d{2,}[,.]\d|\b(count|ratings?|proba|p10|p|lo|hi|x|y)\s*:\s*-?\d", block):
         errors.append("search context must not carry counts, probabilities or coordinates")
-    entries = re.findall(r"\{ term: '", block)
-    if not 4 <= len(entries) <= 12:
-        errors.append(f"source context must stay a small curated map (found {len(entries)} terms)")
-    if "fetch(" in block:
-        errors.append("search resolution must not load an external or community dataset")
-
-    # Markup and accessibility contract.
-    for needle in ['id="searchResolution"', 'id="searchAnnounce" role="status" aria-live="polite"', 'aria-describedby="searchScope"']:
+    if not 4 <= len(re.findall(r"\{ term: '", block)) <= 12:
+        errors.append("source context must stay a small curated list")
+    for needle in ['id="searchAnnounce" role="status" aria-live="polite"', 'aria-describedby="searchScope"']:
         if needle not in html:
-            errors.append(f"search-resolution markup missing: {needle}")
+            errors.append(f"search accessibility markup missing: {needle}")
     if not re.search(r'id="searchResolution"[^>]*\bhidden\b', html):
-        errors.append("search-resolution panel must start hidden (quiet when the search is empty)")
-    if "No matching evidence records." in html:
-        errors.append("dead-end empty state returned")
-    if "setTimeout" not in app_text or "lastAnnounced" not in app_text:
-        errors.append("search status must be debounced and de-duplicated for screen readers")
-    if not re.search(r"\.search-resolution\s*\{[^}]*text-align:\s*center", css):
-        errors.append("search-resolution panel must stay centered")
-    if "event.key === '/'" not in app_text:
+        errors.append("search result panel must start hidden")
+    if "setTimeout" not in app or "lastAnnounced" not in app:
+        errors.append("search announcements must be debounced and de-duplicated")
+    if "event.key === '/'" not in app:
         errors.append("keyboard / shortcut lost")
-
-    public = (html + app_text).lower()
-    for name in HIGH_RISK_NAMES:
-        if re.search(rf"\b{re.escape(name)}\b", public):
-            errors.append(f"named high-risk substance on the evidence map: {name}")
-    for raw in ["count_without_ssc", "proba_life_changing", "results_summary", ".csv"]:
-        if raw in public:
-            errors.append(f"raw community dataset reference on the evidence map: {raw}")
-
     node = shutil.which("node")
     if not node:
-        return errors + ["node is required to run the search-state matrix"]
+        return errors + ["node is required to run the search matrix"]
     interventions = (ROOT / "data" / "interventions.json").read_text(encoding="utf-8")
     run = subprocess.run([node, "-e", block + HARNESS, interventions, json.dumps([c[0] for c in SEARCH_MATRIX])],
                          capture_output=True, text=True, timeout=30)
     if run.returncode != 0:
-        return errors + [f"search-state matrix could not run: {run.stderr.strip()[:300]}"]
-    for (query, expected, must, mustnot), got in zip(SEARCH_MATRIX, json.loads(run.stdout)):
+        return errors + [f"search matrix could not run: {run.stderr.strip()[:300]}"]
+    results = json.loads(run.stdout)
+    for (query, expected, must, mustnot), got in zip(SEARCH_MATRIX, results):
         if got["state"] != expected:
             errors.append(f"search {query!r}: expected {expected}, got {got['state']}")
             continue
-        view = got["view"]
         if expected == "empty":
-            if view is not None:
-                errors.append("empty search must leave the current experience unchanged")
+            if got["view"] is not None:
+                errors.append("empty search must leave the page unchanged")
             continue
-        copy = " ".join(str(view.get(k) or "") for k in ("label", "title", "body", "secondary"))
+        copy = " ".join(str(got["view"].get(k) or "") for k in ("label", "title", "body", "secondary"))
         for needle in must:
             if needle not in copy:
-                errors.append(f"search {query!r}: missing wording {needle!r}")
+                errors.append(f"search {query!r}: missing {needle!r}")
         for needle in mustnot:
             if needle.lower() in copy.lower():
-                errors.append(f"search {query!r}: forbidden wording {needle!r}")
-        if expected in ("reviewed", "broader") and not got["actions"]:
-            errors.append(f"search {query!r}: reviewed result needs an open-record action")
-        if expected not in ("reviewed", "broader") and got["actions"]:
-            errors.append(f"search {query!r}: source-only or unmapped terms must not offer a record action")
-    by_query = {g["q"]: g for g in json.loads(run.stdout)}
-    if by_query.get("Creatine", {}).get("actions") != ["creatine"]:
-        errors.append("Creatine action must open the Creatine record")
-    if by_query.get("Weightlifting", {}).get("actions") != ["physical-activity"]:
-        errors.append("Weightlifting action must open the Physical activity record")
+                errors.append(f"search {query!r}: forbidden {needle!r}")
+        if (expected in ("reviewed", "broader")) != bool(got["actions"]):
+            errors.append(f"search {query!r}: record actions only for reviewed or related evidence")
+    by_q = {g["q"]: g for g in results}
+    if by_q["Creatine"]["actions"] != ["creatine"] or by_q["Weightlifting"]["actions"] != ["physical-activity"]:
+        errors.append("search actions must open the matching reviewed record")
     return errors
 
 
-# Readability floor: visible labels stay at about 11px (.68rem = 10.88px) or larger.
-FLOOR_PX = 10.88
-# The one deliberate exception: mobile map axis ticks are centred on the fixed y-axis gutter
-# (test_map_geometry: "mobile y-axis gutter"); larger ticks cross the plot frame. Their words stay
-# readable in the HTML map key and axis captions. The orbit centre caption ("published 2022") is
-# likewise bounded by the centre circle's chord, so it stays at 12px in SVG units.
-FLOOR_EXCEPTIONS = {("web/styles.css", ".axis-label", "10px")}
-FLOOR_SELECTORS = [".mini-label", ".node-sublabel", ".band-badge", ".source-link small", ".source-claim-id",
-                   ".map-key-item small", ".axis-label", ".axis-caption", ".hero-principles span", ".category-tag",
-                   ".receipt-label", ".principle span", ".trust-pillars span", ".legend", ".resolution-label"]
-
-
-def css_rules(path: Path):
-    css = re.sub(r"/\*.*?\*/", "", path.read_text(encoding="utf-8"), flags=re.S)
-    for m in re.finditer(r"([^{}]+)\{([^{}]*)\}", css):
-        yield m.group(1).strip().splitlines()[-1].strip(), m.group(2)
-
-
-def check_readability_floor() -> list[str]:
+def check_community_map(app: str, html: str) -> list[str]:
     errors: list[str] = []
+    block = app[app.index("const COMMUNITY_EXAMPLES"):app.index("const REGIONS")]
+    rows = re.findall(r"\{ name: '([^']+)', count: (\d+), p: ([\d.]+), lo: ([\d.]+), hi: ([\d.]+) \}", block)
+    if not 6 <= len(rows) <= 8:
+        errors.append(f"community map must cite 6–8 published values (found {len(rows)})")
+    found = {name: (int(c), float(p), float(lo), float(hi)) for name, c, p, lo, hi in rows}
+    if found != CITED:
+        errors.append(f"community map values differ from the verified 2022 citation set: {sorted(set(found.items()) ^ set(CITED.items()))}")
+    for name, (_, p, lo, hi) in found.items():
+        if not lo <= p <= hi:
+            errors.append(f"{name}: value outside its interval")
+        if name.lower() in HIGH_RISK_NAMES or "doing math" in name.lower():
+            errors.append(f"{name} must not be placed on the 2022 map")
+    regions = re.search(r"const REGIONS = \{ countSplit: (\d+), pSplit: ([\d.]+), uncommonOften: (\d+), commonRarely: (\d+), elsewhere: (\d+) \}", app)
+    if not regions or regions.groups() != ("300", "0.02", "18", "20", "78"):
+        errors.append("map regions must use the published thresholds (300 ratings, 0.02) and counts 18 / 20 / 78")
+    elif sum(int(v) for v in regions.groups()[2:]) != 116:
+        errors.append("region counts must cover the 116 plotted items")
+    if "Math.log10" not in app:
+        errors.append("community map must use logarithmic axes")
+    for needle in ["Number of ratings →", "Reported life-changing probability →", 'role="img"', 'aria-labelledby="community-title community-desc"']:
+        if needle not in app + html:
+            errors.append(f"community map labelling missing: {needle}")
+    if "<table" not in html or 'id="mapKeyBody"' not in html:
+        errors.append("every plotted value must also be available as a table")
+    return errors
+
+
+def visible_text(html: str) -> str:
+    p = Inspector()
+    p.feed(html)
+    return html_lib.unescape(" ".join(p.visible))
+
+
+def check_copy(html: str, app: str) -> list[str]:
+    errors: list[str] = []
+    page = visible_text(html)
+    public = (page + " " + js_user_strings(app)).lower()
+    for phrase in BANNED_PHRASES:
+        if re.search(rf"(?<![a-z]){re.escape(phrase)}", public):
+            errors.append(f"product or visitor-directed language on the public page: {phrase!r}")
+    if SECOND_PERSON.search(page + " " + js_user_strings(app)):
+        errors.append("public copy must not address the reader")
+    # Reviewed-evidence text shown on the page follows the same impersonal voice.
+    for name in ("interventions.json", "claims.json", "sources.json"):
+        shown = json.dumps(json.loads((ROOT / "data" / name).read_text(encoding="utf-8")), ensure_ascii=False)
+        if SECOND_PERSON.search(shown):
+            errors.append(f"data/{name} addresses the reader")
+    for label in ["Life-changing probability", "Seven things that stand out", "All community-chart figures on this page come from this published state",
+                  "Life-changing probability is the modeled share of ratings at the top of the scale"]:
+        if label not in page:
+            errors.append(f"plain-language label missing: {label!r}")
+    for label in ["Uncommon, often life-changing", "Common, rarely life-changing", "Reported life-changing probability →", "'Life-changing probability →'"]:
+        if label not in app:
+            errors.append(f"map label missing: {label!r}")
+    if SAFETY_LINE not in page:
+        errors.append("neutral information-only line missing")
+    words = len(re.findall(r"[A-Za-z0-9][A-Za-z0-9,.'’\-]*", page))
+    if words > 1100:
+        errors.append(f"visible copy budget exceeded: {words} words (limit 1,100)")
+    hero = re.search(r'<section class="hero".*?</section>', html, re.S).group(0)
+    hero_words = len(re.findall(r"[A-Za-z0-9][A-Za-z0-9,.'’\-]*", re.sub(r"<[^>]+>", " ", hero)))
+    if hero_words > 16:
+        errors.append(f"first screen must stay short before the map ({hero_words} hero words)")
+    after_hero = html[html.index(hero) + len(hero):]
+    if not re.match(r'\s*<section class="chapter map-chapter" id="map"', after_hero):
+        errors.append("the community map must follow the hero directly")
+    for name in HIGH_RISK_NAMES:
+        if re.search(rf"\b{re.escape(name)}\b", public):
+            errors.append(f"named high-risk substance on the public page: {name}")
+    for raw in ["count_without_ssc", "proba_life_changing", "results_summary", ".csv"]:
+        if raw in public:
+            errors.append(f"raw community dataset reference: {raw}")
+    for fact in INSIGHT_FACTS:
+        if fact not in page:
+            errors.append(f"insight fact missing: {fact!r}")
+    if len(re.findall(r'<li class="insight[ "]', html)) not in range(6, 9):
+        errors.append("What stands out must hold 6–8 observations")
+    data = re.search(r'<section class="chapter" id="data".*?</section>', html, re.S).group(0)
+    data_text = html_lib.unescape(" ".join(re.sub(r"<[^>]+>", " ", data).split()))
+    for fact in DATA_FACTS:
+        if fact not in data_text:
+            errors.append(f"data-about-data figure missing: {fact!r}")
+    if "4.49" in data_text or "4.5×" in data_text:
+        errors.append("the all-rows 4.49× figure must not describe the 116 plotted items")
+    if "later" in data_text.lower():
+        errors.append("no data-about-data figure may describe the later image")
+    snap = re.search(r'<section class="chapter" id="snapshots".*?</section>', html, re.S).group(0)
+    snap_text = html_lib.unescape(" ".join(re.sub(r"<[^>]+>", " ", snap).split()))
+    for needle in ["Published 2022", "Later supplied image", "125", "116", "Doing Math", "undocumented", "no numbers are taken from it"]:
+        if needle not in snap_text:
+            errors.append(f"two-snapshot distinction missing: {needle!r}")
+    # Doing Math never carries a figure: every sentence that names it is free of digits other than the year 2022.
+    vp = Inspector()
+    vp.feed(html)
+    units = [html_lib.unescape(t) for t in vp.visible] + [a or b for a, b in re.findall(r"'([^'\\\n]{4,})'|`([^`]{4,})`", app)]
+    for sentence in (x for u in units for x in re.split(r"(?<=[.!?])\s+", u)):
+        if "doing math" in sentence.lower() and re.search(r"\d", sentence.replace("2022", "")):
+            errors.append(f"Doing Math sentence carries a number: {sentence[:90]!r}")
+    # Whole later-image blocks carry no figures: the Doing Math observation and the later snapshot card.
+    for pattern, label in [(r'<li class="insight insight-feature">.*?</li>', "Doing Math observation"),
+                           (r'<article class="snapshot snapshot-later">.*?</article>', "later-image snapshot")]:
+        m = re.search(pattern, html, re.S)
+        if not m:
+            errors.append(f"{label} missing")
+        elif re.search(r"\d", html_lib.unescape(re.sub(r"<[^>]+>", " ", m.group(0))).replace("2022", "")):
+            errors.append(f"{label} carries a number; the later image has no documented values")
+    return errors
+
+
+# Readability floor: visible text stays at about 11px (.68rem = 10.88px) or larger.
+FLOOR_PX = 10.88
+FLOOR_SELECTORS = [".eyebrow", ".badge", ".map-caption", ".map-key thead th", "#communityMap .tick", "#communityMap .region-label",
+                   "#communityMap .axis-title", "#communityMap .dot-index", ".resolution-label", ".meter-label", ".meter-word",
+                   ".evidence-head", ".source-list span", ".method dt", ".fine", ".receipt-label", ".rho-tick", ".width-value"]
+
+
+def check_readability() -> list[str]:
+    errors: list[str] = []
+    css = re.sub(r"/\*.*?\*/", "", (WEB / "styles.css").read_text(encoding="utf-8"), flags=re.S)
     seen: set[str] = set()
-    for rel in ("web/styles.css", "web/explore.css"):
-        for selector, body in css_rules(ROOT / rel):
-            for decl in re.findall(r"font(?:-size)?\s*:\s*([^;]+)", body):
-                for num, unit in re.findall(r"(\d*\.?\d+)(rem|px)\b", decl):
-                    size = float(num) * (16 if unit == "rem" else 1)
-                    if size < FLOOR_PX and (rel, selector, f"{num}{unit}") not in FLOOR_EXCEPTIONS:
-                        errors.append(f"readability floor: {rel} {selector} uses {num}{unit} (< {FLOOR_PX}px)")
-            seen.update(s.strip() for s in selector.split(","))
+    for m in re.finditer(r"([^{}]+)\{([^{}]*)\}", css):
+        selector, body = m.group(1).strip().splitlines()[-1].strip(), m.group(2)
+        seen.update(s.strip() for s in selector.split(","))
+        for decl in re.findall(r"font(?:-size)?\s*:\s*([^;]+)", body):
+            for num, unit in re.findall(r"(\d*\.?\d+)(rem|px)\b", decl):
+                if float(num) * (16 if unit == "rem" else 1) < FLOOR_PX:
+                    errors.append(f"readability floor: {selector} uses {num}{unit}")
     for selector in FLOOR_SELECTORS:
         if selector not in seen:
             errors.append(f"readability floor: guarded selector {selector} not found")
-    styles = (ROOT / "web/styles.css").read_text(encoding="utf-8")
-    explore = (ROOT / "web/explore.css").read_text(encoding="utf-8")
-    # SVG text scales with its viewBox; these rules keep it near 11px where each drawing shrinks.
-    svg_rules = [
-        (styles, r"@media \(min-width: 651px\) and \(max-width: 1199px\) \{[^@]*\.axis-label \{ font-size:13\.8px", "desktop map axis labels 13.8px (651–1199)"),
-        (styles, r"@media \(min-width: 651px\) and \(max-width: 1199px\) \{[^@]*\.node-sublabel \{ font-size:14px", "desktop map sublabels 14px (651–1199)"),
-        (styles, r"@media \(max-width: 650px\) \{ \.node-index \{ font-size:12\.5px", "mobile map indices 12.5px"),
-        (explore, r"@media \(min-width: 980px\) and \(max-width: 1199px\) \{ \.o-num \{ font-size: 14\.5px", "orbit branch numbers 14.5px (980–1199)"),
-        (explore, r"\.o-csub \{ font: 400 12px", "orbit centre caption 12px (largest size inside the centre circle)"),
-    ]
-    for source, pattern, label in svg_rules:
-        if not re.search(pattern, source):
-            errors.append(f"readability floor: missing SVG scaling rule for {label}")
+    if "prefers-reduced-motion" not in css:
+        errors.append("reduced-motion support missing")
+    for rule, needle in [(".chapter", "text-align: center"), (".hero", "text-align: center"), (".search-resolution", "text-align: center")]:
+        m = re.search(re.escape(rule) + r"\s*\{([^}]*)\}", css)
+        if not m or needle not in m.group(1):
+            errors.append(f"centered spine lost: {rule} needs {needle}")
     return errors
 
 
 def main() -> int:
-    html_path = WEB / "index.html"
-    text = html_path.read_text(encoding="utf-8")
-    parser = Inspector(); parser.feed(text)
-    errors = []
-    required_ids = {"searchInput", "evidenceMap", "cardGrid", "detailDialog", "trustDialog", "methodDialog", "reviewDate", "mapKey", "mapStatus", "methodButton", "trustButton"}
-    missing = required_ids - parser.ids
-    if missing: errors.append(f"missing required IDs: {sorted(missing)}")
-    if parser.lang != "en": errors.append("html lang must be en")
-    if parser.h1 != 1: errors.append(f"expected exactly one h1, found {parser.h1}")
-    for ref in parser.scripts + parser.styles:
+    html = (WEB / "index.html").read_text(encoding="utf-8")
+    app = (WEB / "app.js").read_text(encoding="utf-8")
+    p = Inspector()
+    p.feed(html)
+    errors: list[str] = []
+    missing = REQUIRED_IDS - set(p.ids)
+    if missing:
+        errors.append(f"missing required IDs: {sorted(missing)}")
+    if len(p.ids) != len(set(p.ids)):
+        errors.append("duplicate element IDs")
+    if p.lang != "en" or p.h1 != 1:
+        errors.append("html lang must be en with exactly one h1")
+    positions = [html.find(f'id="{sid}"') for sid in SECTION_ORDER]
+    if -1 in positions or positions != sorted(positions):
+        errors.append(f"sections must appear in order: {' → '.join(SECTION_ORDER)}")
+    if p.nav != NAV:
+        errors.append(f"navigation must be exactly Map · Insights · Evidence · Sources (found {p.nav})")
+    for ref in p.scripts + p.styles:
         if ref.startswith(("http://", "https://", "//")):
-            errors.append(f"external runtime dependency not allowed in v0.1: {ref}")
-        elif not local_ref_exists(ref):
+            errors.append(f"external runtime dependency not allowed: {ref}")
+        elif not (WEB / ref).resolve().exists():
             errors.append(f"missing local asset: {ref}")
-    if "prefers-reduced-motion" not in (WEB / "styles.css").read_text(encoding="utf-8"):
-        errors.append("reduced-motion support missing")
-    if "aria-live" not in text:
-        errors.append("dynamic evidence grid should expose aria-live")
-    if 'id="mapStatus" role="status" aria-live="polite"' not in text:
-        errors.append("map result status should be politely announced")
-    if text.count('aria-pressed="') < 7:
-        errors.append("filter/detail toggles should expose aria-pressed state")
-    canonical = 'https://luckygithub777.github.io/nootropics-map/'
-    if f'rel="canonical" href="{canonical}"' not in text:
-        errors.append("canonical Pages URL missing")
-    if f'property="og:url" content="{canonical}"' not in text:
-        errors.append("Open Graph URL missing")
-    if 'social-preview.png' not in text or not (WEB / "social-preview.png").exists():
-        errors.append("first-party social preview missing")
-    app_text = (WEB / "app.js").read_text(encoding="utf-8")
-    for token in ("history.pushState", "syncDetailFromLocation", "popstate", "hashchange"):
-        if token not in app_text:
-            errors.append(f"deep-link contract missing: {token}")
-    if ".ghost-button { display:none; }" in (WEB / "styles.css").read_text(encoding="utf-8"):
-        errors.append("mobile Method control must remain available")
-    if not parser.dialogs:
-        errors.append("detail dialogs missing")
-    if not (WEB / "favicon.svg").exists():
-        errors.append("favicon missing")
-
-    # Centered spine: Explore, Evidence Library and Trust Architecture stay on one centered axis.
-    css = (WEB / "styles.css").read_text(encoding="utf-8")
-    marker = "/* Centered spine:"
-    if marker not in css:
-        errors.append("centered-spine stylesheet block missing")
-    else:
-        spine = css[css.index(marker):]
-        required = {
-            ".section-heading": ["align-items:center", "text-align:center"],
-            ".section-note": ["text-align:center"],
-            ".filter-row": ["justify-content:center"],
-            ".trust-strip": ["grid-template-columns:minmax(0,1fr)", "justify-items:center", "text-align:center"],
-            ".trust-pillars > div": ["text-align:center"],
-        }
-        for selector, declarations in required.items():
-            rule = re.search(re.escape(selector) + r"\s*\{([^}]*)\}", spine)
-            body = rule.group(1).replace(" ", "") if rule else ""
-            for declaration in declarations:
-                if declaration not in body:
-                    errors.append(f"centered spine lost: {selector} needs {declaration}")
-        if ".section-heading > div:not(.view-toggle)" not in spine or re.search(r"\.section-heading\s*>\s*div\s*\{", spine):
-            errors.append("centered heading rule must not restyle the Simple/Detailed toggle")
-        if not re.search(r"\.card-grid\s*\{[^}]*justify-content:\s*center", spine):
-            errors.append("evidence card rows must wrap toward the center")
-        if re.search(r"text-align\s*:\s*(left|start)|align-items\s*:\s*flex-start", spine):
-            errors.append("centered spine overridden by a later left-aligned rule")
-
-    errors.extend(check_search_states(text, app_text, css))
-    errors.extend(check_readability_floor())
-
+    if 'class="skip-link" href="#map"' not in html:
+        errors.append("skip link to the map missing")
+    if 'id="evidenceList" aria-live="polite"' not in html:
+        errors.append("evidence list must announce search changes politely")
+    for needle in [f'rel="canonical" href="{CANONICAL}"', f'property="og:url" content="{CANONICAL}"', "social-preview.png"]:
+        if needle not in html:
+            errors.append(f"share metadata missing: {needle}")
+    for token in ("history.pushState", "syncDetailFromLocation", "popstate", "hashchange", "showModal"):
+        if token not in app:
+            errors.append(f"record deep-link contract missing: {token}")
+    if "innerHTML" in app:
+        errors.append("app.js must build the page with DOM methods, not innerHTML")
+    for token in ("Limitations", "Safety context", "Sources", "Reviewed ${item.reviewed_at}", "source_claims", "limitations"):
+        if token not in app:
+            errors.append(f"reviewed record detail must keep {token!r}")
+    if set(re.findall(r"fetch\('([^']+)'\)", app)) != {"../data/interventions.json", "../data/claims.json", "../data/sources.json"}:
+        errors.append("reviewed evidence must come only from data/*.json")
+    if 'href="./explore.html"' in html:
+        errors.append("the main page must not link to the compatibility route")
+    errors += check_copy(html, app)
+    errors += check_community_map(app, html)
+    errors += check_search(html, app)
+    errors += check_readability()
     if errors:
         print("SITE TEST: FAIL")
-        for e in errors: print(f" - {e}")
+        for e in errors:
+            print(f" - {e}")
         return 1
-    print("SITE TEST: PASS — structural, dependency, and accessibility smoke checks passed")
+    print("SITE TEST: PASS — single-page structure, copy, cited values, search, evidence access and readability verified")
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

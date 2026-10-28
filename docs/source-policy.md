@@ -53,5 +53,6 @@ The guided reading refers to two separate source states. They must not be merged
 
 - A reuse license that would allow importing or redistributing the upstream community dataset has not been established for this project. The upstream repository reviewed for verification did not include a license file.
 - Do not copy third-party raw community data into this repository without explicit permission or a completed license review.
-- Citing a small number of published aggregate results with attribution, as the guided reading does, is not an import of the dataset.
+- Citing a small number of published aggregate results with attribution is not an import of the dataset. The community map cites seven published 2022 items with their model intervals and the published region counts; it is an explanatory diagram, not a Community Signal layer.
+- The later supplied image is described in words only. No values, positions or coordinates are taken from it, and it is not published on the site.
 - A future quantitative Community Signal layer still requires provenance-complete, reusable data, a documented methodology, stated sampling limitations, and uncertainty labels before it can ship.

@@ -2,215 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="dark" />
-  <meta name="theme-color" content="#0a0a0a" />
-  <meta name="description" content="A guided reading of a crowdsourced nootropics chart, kept separate from the reviewed evidence behind Nootropics Map." />
-  <meta name="robots" content="index,follow" />
-  <link rel="canonical" href="https://luckygithub777.github.io/nootropics-map/explore.html" />
-  <meta property="og:title" content="Nootropics Map · Guided reading" />
-  <meta property="og:description" content="See the signal. Trace the evidence." />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="Nootropics Map" />
-  <meta property="og:url" content="https://luckygithub777.github.io/nootropics-map/explore.html" />
-  <meta property="og:image" content="https://luckygithub777.github.io/nootropics-map/social-preview.png" />
-  <meta property="og:image:alt" content="Nootropics Map — What changes the mind? Follow the evidence." />
-  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="robots" content="noindex,follow" />
+  <title>Nootropics Map</title>
+  <link rel="canonical" href="https://luckygithub777.github.io/nootropics-map/" />
   <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
-  <title>Nootropics Map · Guided reading</title>
-  <link rel="stylesheet" href="./explore.css" />
+  <noscript><meta http-equiv="refresh" content="0; url=./" /></noscript>
+  <style>
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #0a0a0a; color: #f0ede4; font: 16px/1.5 Georgia, "Times New Roman", serif; }
+    a { color: #d9c8a2; }
+  </style>
+  <script src="./explore.js"></script>
 </head>
 <body>
-  <a class="skip-link" href="#reading">Skip to the guided reading</a>
-
-  <header class="top">
-    <a class="brand" href="./" aria-label="Nootropics Map home">
-      <span class="brand-mark" aria-hidden="true">◌</span>
-      <span>NOOTROPICS / MAP</span>
-    </a>
-    <nav class="nav" aria-label="Sections">
-      <a href="./">Evidence map</a>
-      <a href="#dataAboutData">Data about data</a>
-      <a href="#lenses">Signal and evidence</a>
-      <a href="#pathways">Pathways</a>
-      <a href="#reading">Guided reading</a>
-      <a href="#receipts">Receipts</a>
-    </nav>
-  </header>
-
-  <main class="wrap">
-    <section class="hero" aria-labelledby="heroTitle">
-      <p class="eyebrow">Guided reading · Explore broadly · Verify narrowly</p>
-      <h1 id="heroTitle">What changes the mind? <em>See the signal. Trace the evidence.</em></h1>
-      <p class="lede">The published 2022 Nootroflix analysis drew 36,163 community ratings as one chart and made nootropics feel mappable. This page reads that chart carefully, then shows what reviewed sources actually support. The two never merge.</p>
-      <dl class="stats">
-        <div><dt>Ratings · published 2022</dt><dd>36,163</dd></div>
-        <div><dt>People · published 2022</dt><dd>2,802</dd></div>
-        <div><dt>Reviewed claims</dt><dd id="claimCount">—</dd></div>
-        <div><dt>Public sources</dt><dd id="sourceCount">—</dd></div>
-      </dl>
-      <aside class="safety source-state" id="sourceState" aria-label="Source states">
-        <p class="eyebrow">Two source states</p>
-        <p><strong>Published 2022 analysis.</strong> 36,163 ratings from 2,802 people; a public result table of 125 items, of which the published code plots the 116 with more than 10 new ratings. Every number on this page comes from this state.</p>
-        <p><strong>Later supplied image.</strong> A larger version of the chart image also circulates. The later image includes labels such as Doing Math that are absent from the 2022 result table, and it draws its y-axis differently. Its underlying dataset has not been published, so none of the 2022 totals or positions are assigned to it.</p>
-      </aside>
-    </section>
-
-    <section id="dataAboutData" class="dad" aria-labelledby="dadTitle">
-      <div class="head">
-        <p class="eyebrow">Data about data · published 2022 analysis</p>
-        <h2 id="dadTitle">What the data says about itself</h2>
-        <p>The chart contains clues about how much confidence to place in the chart itself. Every figure in this section was recomputed from the published 2022 result table and plotting code. None of it describes the later supplied image, whose dataset remains undocumented.</p>
-      </div>
-      <ol class="dad-list">
-        <li class="dad-step">
-          <p class="dad-num" aria-hidden="true">01</p>
-          <h3>Not every result becomes a plotted point.</h3>
-          <p class="dad-figure"><span class="dad-big">125</span> <span class="dad-arrow" aria-hidden="true">→</span><span class="sr-only">become</span> <span class="dad-big">116</span></p>
-          <p class="dad-caption">125 result-table items → 116 plotted</p>
-          <p>The published plot draws an item only when it has more than 10 new Nootroflix ratings. The nine items left off still appear in the result table. Leaving them off says nothing about whether they work or are safe, only that there were few new ratings to place them.</p>
-        </li>
-        <li class="dad-step">
-          <p class="dad-num" aria-hidden="true">02</p>
-          <h3>More ratings do not mean more reported impact.</h3>
-          <figure class="dad-rho">
-            <p class="dad-figure"><span class="dad-big">Spearman ρ ≈ 0.14</span></p>
-            <div class="rho-scale" aria-hidden="true">
-              <span class="rho-track"></span>
-              <span class="rho-tick at-min">−1</span>
-              <span class="rho-tick at-zero">0</span>
-              <span class="rho-tick at-max">+1</span>
-              <span class="rho-mark"></span>
-            </div>
-            <figcaption class="dad-caption">Rank relationship between rating count and modeled life-changing probability across the 116 plotted items, on a scale from −1 to +1</figcaption>
-          </figure>
-          <p>Popularity and reported transformation barely move together: the rank relationship is weak and positive. High volume is not evidence quality, and reported transformation is not scientific efficacy.</p>
-        </li>
-        <li class="dad-step">
-          <p class="dad-num" aria-hidden="true">03</p>
-          <h3>Less data means more uncertainty.</h3>
-          <figure class="dad-widths">
-            <figcaption class="dad-caption">Median model interval width for the chance of a 10, plotted items grouped by total ratings</figcaption>
-            <div class="iw-row">
-              <p class="iw-label"><strong>Fewer than 50 ratings</strong><span>20 items · median width ≈ 0.048</span></p>
-              <span class="iw-line iw-low" aria-hidden="true"></span>
-            </div>
-            <div class="iw-row">
-              <p class="iw-label"><strong>500 or more ratings</strong><span>20 items · median width ≈ 0.012</span></p>
-              <span class="iw-line iw-high" aria-hidden="true"></span>
-            </div>
-          </figure>
-          <p>For sparsely rated items the model&rsquo;s interval is about 4× wider (≈3.9×) than for widely rated ones. Line length shows the width of uncertainty, not the size of any effect.</p>
-        </li>
-        <li class="dad-step">
-          <p class="dad-num" aria-hidden="true">04</p>
-          <h3>More ratings can narrow an estimate. They cannot turn self-report into an experiment.</h3>
-          <p>More observations can tighten the community estimate. They do not add randomization, blinding, placebo control, representative sampling or causal inference, so more ratings are not better scientific evidence.</p>
-          <ul class="dad-neq" aria-label="Distinctions to keep">
-            <li>Volume <span aria-hidden="true">≠</span><span class="sr-only">is not</span> truth</li>
-            <li>Reported impact <span aria-hidden="true">≠</span><span class="sr-only">is not</span> efficacy</li>
-            <li>Precision <span aria-hidden="true">≠</span><span class="sr-only">is not</span> validity</li>
-            <li>Signal <span aria-hidden="true">≠</span><span class="sr-only">is not</span> recommendation</li>
-          </ul>
-        </li>
-      </ol>
-      <p class="dad-close">The chart does not only describe interventions. Its shape also tells us how carefully the chart itself should be read.</p>
-    </section>
-
-    <section id="lenses" aria-labelledby="lensTitle">
-      <div class="head">
-        <p class="eyebrow">Two questions</p>
-        <h2 id="lensTitle">Signal is not evidence. Evidence is not effect size.</h2>
-        <p>The community chart and the reviewed records are most useful side by side, as long as neither is read as the other.</p>
-        <p id="differentQuestions">Different datasets and different questions can produce different-looking signals; they should not be treated as contradictory unless the claims actually match. Creatine rarely felt life-changing to raters asked about cognition, while the reviewed claim is about strength, power and repeated high-intensity effort. Those are different questions, not a disagreement.</p>
-      </div>
-      <div class="duo">
-        <article class="card">
-          <p class="eyebrow">Community signal</p>
-          <h3>What did people report?</h3>
-          <p>Across: how many people rated it. Up: how often a rating was a 10, “life-changing”. A place to find questions, not answers.</p>
-          <div class="metrics"><div class="metric"><strong>Reach</strong><span>How many ratings?</span></div><div class="metric"><strong>Reported impact</strong><span>How often a 10?</span></div></div>
-          <div class="flow"><span>Self-report</span><b aria-hidden="true">→</b><span>Signal</span><b aria-hidden="true">→</b><span>Question</span></div>
-        </article>
-        <div class="neq" aria-hidden="true">≠</div>
-        <article class="card">
-          <p class="eyebrow">Reviewed evidence</p>
-          <h3>What do sources support?</h3>
-          <p>Across: how mature the evidence base is. Up: how strongly it supports one bounded claim. Neither axis measures effect size or personal fit.</p>
-          <div class="metrics"><div class="metric"><strong>Maturity</strong><span>How developed is the evidence?</span></div><div class="metric"><strong>Confidence</strong><span>How well supported is this claim?</span></div></div>
-          <div class="flow"><span>Source</span><b aria-hidden="true">→</b><span>Claim</span><b aria-hidden="true">→</b><span>Assessment</span><b aria-hidden="true">→</b><span>Receipt</span></div>
-        </article>
-      </div>
-    </section>
-
-    <section id="pathways" aria-labelledby="pathTitle">
-      <div class="head">
-        <p class="eyebrow">From intervention to outcome</p>
-        <h2 id="pathTitle">Trace each reviewed claim to what it actually says</h2>
-        <p>Each chain restates one reviewed claim, step by step. Nothing beyond the claim is added, and missing links stay missing.</p>
-      </div>
-      <div class="paths" id="paths" aria-label="Reviewed interventions"></div>
-      <div class="card path-out" id="pathOut" aria-live="polite">
-        <p class="status-note" id="pathStatus">Loading reviewed records…</p>
-      </div>
-    </section>
-
-    <section id="reading" aria-labelledby="readTitle">
-      <div class="head">
-        <p class="eyebrow">Guided reading</p>
-        <h2 id="readTitle">Absorb the whole story, not just the points</h2>
-        <p>Forty-seven ideas in eight branches: where the community chart came from, how to read it, why it misleads, what it teaches, and how Nootropics Map is built and checked. Use the arrow keys to move through them.</p>
-      </div>
-      <div class="branch-list" id="branchList" aria-label="Branches"></div>
-      <div class="reader">
-        <div class="card orbit"><svg id="orbit" viewBox="0 0 600 600" role="group" aria-label="Eight branches around the community chart"></svg></div>
-        <div class="card read-panel" aria-live="polite">
-          <div class="read-top">
-            <p class="eyebrow" id="readEyebrow">Center</p>
-            <div class="seg" role="group" aria-label="Reading depth">
-              <button type="button" data-depth="simple" aria-pressed="true">Simple</button>
-              <button type="button" data-depth="detailed" aria-pressed="false">Detailed</button>
-            </div>
-          </div>
-          <h3 id="readNodeTitle">The Nootroflix chart</h3>
-          <p class="simple" id="readSimple"></p>
-          <p class="detail" id="readDetail"></p>
-          <div class="chips" id="readLeaves"></div>
-          <div class="read-foot">
-            <button type="button" class="btn" id="readPrev">Previous</button>
-            <span class="counter" id="readCount">1 / 47</span>
-            <button type="button" class="btn primary" id="readNext">Next</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="receipts" aria-labelledby="receiptTitle">
-      <div class="head">
-        <p class="eyebrow">Evidence ledger</p>
-        <h2 id="receiptTitle">Every reviewed point leaves a receipt</h2>
-        <p>The first release starts narrow on purpose. Open any receipt to see what the sources support, the limitations and the safety context.</p>
-      </div>
-      <div class="receipts" id="receiptGrid" aria-live="polite">
-        <p class="status-note" id="receiptStatus">Loading reviewed records…</p>
-      </div>
-    </section>
+  <main>
+    <p>Nootropics Map has moved to one page. <a id="continue" href="./">Continue to Nootropics Map</a></p>
   </main>
-
-  <footer class="foot">
-    <p class="eyebrow">The north star</p>
-    <h2>Explore broadly. Verify narrowly. Preserve uncertainty.</h2>
-    <div class="links">
-      <a href="./">Open the evidence map</a>
-      <a href="https://troof.blog/posts/nootropics/" target="_blank" rel="noopener noreferrer">Original community analysis (Troof, 2022)</a>
-    </div>
-    <div class="safety">
-      <p class="eyebrow">Safety boundary</p>
-      <p>Educational evidence navigation only. Community signal does not establish efficacy, safety, dosing or personal suitability. Prescription and research compounds carry real risks; talk to a clinician before starting or changing any medicine or supplement.</p>
-      <p class="fine">This page describes the community chart in words. It does not reproduce either version of the chart, its coordinates or its rankings, and it copies no upstream raw community data.</p>
-    </div>
-  </footer>
-
-  <script src="./explore.js" defer></script>
 </body>
 </html>

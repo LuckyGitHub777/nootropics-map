@@ -4,13 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="dark" />
-  <meta name="description" content="A source-backed visual evidence map for nootropics and cognition-related interventions." />
+  <meta name="description" content="What thousands of people reported about nootropics, sleep, exercise and supplements, read carefully and checked against independent sources." />
   <meta name="theme-color" content="#0a0a09" />
   <meta name="robots" content="index,follow" />
   <meta name="application-name" content="Nootropics Map" />
   <link rel="canonical" href="https://luckygithub777.github.io/nootropics-map/" />
   <meta property="og:title" content="Nootropics Map" />
-  <meta property="og:description" content="What changes the mind? See the signal. Trace the evidence." />
+  <meta property="og:description" content="What changes the mind? A community chart, read carefully and checked against the evidence." />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Nootropics Map" />
   <meta property="og:url" content="https://luckygithub777.github.io/nootropics-map/" />
@@ -20,7 +20,7 @@
   <meta property="og:image:alt" content="Nootropics Map — What changes the mind? Follow the evidence." />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Nootropics Map" />
-  <meta name="twitter:description" content="What changes the mind? See the signal. Trace the evidence." />
+  <meta name="twitter:description" content="What changes the mind? A community chart, read carefully and checked against the evidence." />
   <meta name="twitter:image" content="https://luckygithub777.github.io/nootropics-map/social-preview.png" />
   <meta name="twitter:image:alt" content="Nootropics Map — What changes the mind? Follow the evidence." />
   <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
@@ -28,33 +28,156 @@
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <a class="skip-link" href="#explorer">Skip to explorer</a>
+  <a class="skip-link" href="#map">Skip to the community map</a>
 
-  <header class="site-header" aria-label="Primary">
-    <a class="brand" href="#top" aria-label="Nootropics Map home">
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Nootropics Map, top of page">
       <span class="brand-mark" aria-hidden="true">◌</span>
       <span>NOOTROPICS / MAP</span>
     </a>
-    <div class="header-actions">
-      <a class="ghost-button" id="readingLink" href="./explore.html"><span class="trust-label-full">Guided reading</span><span class="trust-label-short">Guide</span></a>
-      <button class="ghost-button" id="methodButton" type="button">Method</button>
-      <button class="trust-button" id="trustButton" type="button" aria-label="Why trust this?"><span class="trust-label-full">Why trust this?</span><span class="trust-label-short" aria-hidden="true">Trust</span></button>
-    </div>
+    <nav class="site-nav" aria-label="Sections">
+      <a href="#map">Map</a>
+      <a href="#insights">Insights</a>
+      <a href="#evidence">Evidence</a>
+      <a href="#sources">Sources</a>
+    </nav>
   </header>
 
   <main id="top">
     <section class="hero" aria-labelledby="hero-title">
-      <div class="hero-field" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
-      <p class="eyebrow">A VISUAL FIELD GUIDE · NOOTROPICS · COGNITION · EVIDENCE</p>
-      <h1 id="hero-title">What changes the mind?<br /><span>Follow the evidence.</span></h1>
-      <p class="hero-copy">
-        Explore nootropics and cognition-related interventions—from substances and supplements to sleep, movement, light, and attention—without confusing popularity, novelty, or self-report with scientific evidence.
-      </p>
+      <h1 id="hero-title">What changes the mind? <span>Follow the evidence.</span></h1>
+      <p class="hero-copy">36,163 ratings from 2,802 people, drawn as one chart.</p>
+    </section>
+
+    <section class="chapter map-chapter" id="map" aria-labelledby="map-title">
+      <p class="eyebrow" id="map-title">Community map · published 2022</p>
+      <figure class="community-map">
+        <div class="map-frame">
+          <svg id="communityMap" viewBox="0 0 960 560" role="img" aria-labelledby="community-title community-desc">
+            <title id="community-title">Number of ratings by reported life-changing probability</title>
+            <desc id="community-desc">Seven items from the published 2022 community analysis, placed at their published values on logarithmic axes, with the two shaded regions defined by the published plotting code. The table below lists every value.</desc>
+          </svg>
+        </div>
+        <figcaption class="map-caption">Seven of the 116 plotted items, at published 2022 values. Life-changing probability is the modeled share of ratings at the top of the scale; vertical lines show each model interval.</figcaption>
+      </figure>
+      <table class="map-key" id="mapKey">
+        <caption class="sr-only">Published 2022 values for the seven items on the map</caption>
+        <thead><tr><th scope="col"><span class="sr-only">Number</span></th><th scope="col">Item</th><th scope="col">Ratings</th><th scope="col">Life&#8209;changing probability</th></tr></thead>
+        <tbody id="mapKeyBody"></tbody>
+      </table>
+    </section>
+
+    <section class="chapter" id="insights" aria-labelledby="insights-title">
+      <p class="eyebrow">What stands out</p>
+      <h2 id="insights-title">Seven things that stand out</h2>
+      <ol class="insights">
+        <li class="insight">
+          <span class="badge">2022 chart</span>
+          <h3>Behaviors sit among the compounds</h3>
+          <p>Weightlifting, trying to get more sleep and meditation all place in the top ten of 125 items for life-changing probability.</p>
+        </li>
+        <li class="insight">
+          <span class="badge">2022 chart</span>
+          <h3>Weightlifting ranks third</h3>
+          <p>Third of 125 items at 0.121, above every supplement and every other behavior in the table.</p>
+        </li>
+        <li class="insight">
+          <span class="badge">2022 chart</span>
+          <h3>Caffeine: most rated, rarely life-changing</h3>
+          <p>2,553 ratings, more than any other item, with a life-changing probability of 0.030.</p>
+        </li>
+        <li class="insight">
+          <span class="badge">2022 chart</span>
+          <h3>Familiar supplements sit low</h3>
+          <p>Creatine, theanine and omega-3 each drew 956 to 1,322 ratings and all fall in the common, rarely life-changing region.</p>
+        </li>
+        <li class="insight">
+          <span class="badge">2022 chart</span>
+          <h3>Popularity barely tracks impact</h3>
+          <p>Across the 116 plotted items, rating count and life-changing probability have a rank correlation of only ρ ≈ 0.14.</p>
+        </li>
+        <li class="insight">
+          <span class="badge">2022 chart</span>
+          <h3>Sparse points are uncertain</h3>
+          <p>Items with fewer than 50 ratings carry intervals about four times wider than items with 500 or more.</p>
+        </li>
+        <li class="insight insight-feature">
+          <span class="badge badge-later">Later image</span>
+          <h3>Doing Math appears</h3>
+          <p>Absent from the 2022 table, it is among the most prominent labels in the later image’s upper right. The chart changed.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="chapter" id="snapshots" aria-labelledby="snapshots-title">
+      <p class="eyebrow">Two snapshots</p>
+      <h2 id="snapshots-title">The chart changed</h2>
+      <div class="snapshots">
+        <article class="snapshot">
+          <p class="badge">Published 2022</p>
+          <h3>A public result table</h3>
+          <ul>
+            <li><strong>36,163</strong> ratings from <strong>2,802</strong> people</li>
+            <li><strong>125</strong> items in the result table</li>
+            <li><strong>116</strong> plotted, each with more than 10 new ratings</li>
+            <li>All community-chart figures on this page come from this published state</li>
+          </ul>
+        </article>
+        <article class="snapshot snapshot-later">
+          <p class="badge badge-later">Later supplied image</p>
+          <h3>A larger chart, no public data</h3>
+          <div class="quadrant" aria-hidden="true"><span></span><span class="lit"></span><span></span><span></span></div>
+          <ul>
+            <li>Labels absent from the 2022 table, including <strong>Doing Math</strong></li>
+            <li>Doing Math sits among the most prominent labels in the upper right</li>
+            <li>Some familiar items sit in visibly different places</li>
+            <li>Its underlying data is undocumented, so no numbers are taken from it</li>
+          </ul>
+        </article>
+      </div>
+      <p class="statement">Doing Math changes how the chart reads: the landscape includes behavior and learning, not only compounds.</p>
+    </section>
+
+    <section class="chapter" id="data" aria-labelledby="data-title">
+      <p class="eyebrow">Data about the data · published 2022</p>
+      <h2 id="data-title">How carefully to read the chart</h2>
+      <div class="figures">
+        <figure class="figure">
+          <p class="figure-big">125 <span aria-hidden="true">→</span><span class="sr-only">to</span> 116</p>
+          <figcaption><strong>Not every result is plotted.</strong> 125 result-table items · 116 plotted</figcaption>
+        </figure>
+        <figure class="figure">
+          <p class="figure-big">ρ ≈ 0.14</p>
+          <div class="rho-scale" aria-hidden="true">
+            <span class="rho-track"></span>
+            <span class="rho-tick at-min">−1</span>
+            <span class="rho-tick at-zero">0</span>
+            <span class="rho-tick at-max">+1</span>
+            <span class="rho-mark"></span>
+          </div>
+          <figcaption><strong>Popularity barely tracks reported transformation.</strong> Spearman rank correlation, rating count vs life-changing probability</figcaption>
+        </figure>
+        <figure class="figure">
+          <p class="figure-big">≈4×</p>
+          <div class="widths">
+            <p class="width-row"><span class="width-label">&lt;50 ratings</span><span class="width-line w-low" aria-hidden="true"></span><span class="width-value">≈0.048</span></p>
+            <p class="width-row"><span class="width-label">500+ ratings</span><span class="width-line w-high" aria-hidden="true"></span><span class="width-value">≈0.012</span></p>
+          </div>
+          <figcaption><strong>Sparse estimates are much less precise.</strong> Median model interval width, 20 items in each group (≈3.9×)</figcaption>
+        </figure>
+      </div>
+      <p class="statement">More ratings improve precision. They do not turn self-report into an experiment.</p>
+    </section>
+
+    <section class="chapter" id="evidence" aria-labelledby="evidence-title">
+      <p class="eyebrow">Evidence check</p>
+      <h2 id="evidence-title">Signal is not evidence. Evidence is not effect size.</h2>
+      <p class="chapter-lede">Five related claims, checked against independent sources.</p>
       <div class="search-shell">
-        <label class="sr-only" for="searchInput">Search Nootropics Map</label>
-        <span class="sr-only" id="searchScope">Results explain whether a term has a reviewed record, broader reviewed record, source context, or is not mapped in this release.</span>
+        <label class="sr-only" for="searchInput">Search the chart and the evidence</label>
+        <span class="sr-only" id="searchScope">Results show whether a term is reviewed, has related evidence, appears in the 2022 chart or the later image, or is not in the current index.</span>
         <span aria-hidden="true" class="search-icon">⌕</span>
-        <input id="searchInput" type="search" autocomplete="off" aria-describedby="searchScope" placeholder="Search sleep, light, creatine, meditation…" />
+        <input id="searchInput" type="search" autocomplete="off" aria-describedby="searchScope" placeholder="Search caffeine, doing math…" />
         <kbd>/</kbd>
       </div>
       <section class="search-resolution" id="searchResolution" aria-labelledby="resolutionLabel" hidden>
@@ -62,145 +185,48 @@
         <p class="resolution-title" id="resolutionTitle"></p>
         <p class="resolution-body" id="resolutionBody"></p>
         <p class="resolution-secondary" id="resolutionSecondary"></p>
-        <p class="resolution-filter" id="resolutionFilter" hidden></p>
         <div class="resolution-actions" id="resolutionActions"></div>
       </section>
       <p class="sr-only" id="searchAnnounce" role="status" aria-live="polite" aria-atomic="true"></p>
-      <div class="hero-principles" aria-label="Evidence principles"><span>Source-backed</span><span>Uncertainty visible</span><span>No rankings</span></div>
-      <div class="hero-meta" aria-label="Current evidence bundle metadata">
-        <span><strong id="interventionCount">—</strong> interventions</span>
-        <span><strong id="claimCount">—</strong> evidence receipts</span>
-        <span>Reviewed <strong id="reviewDate">—</strong></span>
-      </div>
+      <div class="evidence-head" aria-hidden="true"><span>Claim</span><span>Evidence</span><span>Confidence</span></div>
+      <ul class="evidence-list" id="evidenceList" aria-live="polite"></ul>
+      <p id="emptyState" class="empty-state" hidden>No reviewed record matches this search.</p>
+      <p class="evidence-meta"><span id="reviewNote">Reviewed —</span></p>
     </section>
 
-    <section class="explorer" id="explorer" aria-labelledby="explorer-title">
-      <div class="section-heading">
+    <section class="chapter sources" id="sources" aria-labelledby="sources-title">
+      <p class="eyebrow">Sources</p>
+      <h2 id="sources-title">Where every figure comes from</h2>
+      <div class="source-columns">
         <div>
-          <p class="eyebrow">EXPLORE</p>
-          <h2 id="explorer-title">Evidence maturity × Confidence</h2>
+          <h3>Community data</h3>
+          <ul class="source-list">
+            <li><a href="https://troof.blog/posts/nootropics/" target="_blank" rel="noopener noreferrer">Nootroflix community analysis</a><span>Troof · 2022 · original chart and write-up</span></li>
+            <li><a href="https://github.com/LeoGrin/nootroflix" target="_blank" rel="noopener noreferrer">Result table and plotting code</a><span>Published 2022 analysis repository</span></li>
+          </ul>
         </div>
-        <p class="section-note">
-          Ordinal evidence-literacy map—not an effect-size score or recommendation engine.
-        </p>
-      </div>
-
-      <div class="filter-row" role="toolbar" aria-label="Filter interventions">
-        <button class="filter-chip active" data-category="all" type="button" aria-pressed="true">All</button>
-        <button class="filter-chip" data-category="behavior" type="button" aria-pressed="false">Behavior</button>
-        <button class="filter-chip" data-category="exercise" type="button" aria-pressed="false">Exercise</button>
-        <button class="filter-chip" data-category="environment" type="button" aria-pressed="false">Environment</button>
-        <button class="filter-chip" data-category="nutrition" type="button" aria-pressed="false">Nutrition</button>
-      </div>
-
-      <div class="atlas-grid">
-        <section class="map-card" aria-label="Evidence maturity and confidence map">
-          <div class="map-header">
-            <div>
-              <span class="mini-label">MAP VIEW</span>
-              <strong id="mapStatus" role="status" aria-live="polite" aria-atomic="true">All evidence records</strong>
-            </div>
-            <div class="legend" aria-label="Evidence legend">
-              <span><i class="legend-dot emerging"></i> Emerging</span>
-              <span><i class="legend-dot moderate"></i> Moderate</span>
-              <span><i class="legend-dot strong"></i> Strong</span>
-            </div>
-          </div>
-          <div class="map-wrap">
-            <svg id="evidenceMap" viewBox="0 0 900 520" role="img" aria-labelledby="map-title map-desc">
-              <title id="map-title">Evidence maturity by assessment confidence</title>
-              <desc id="map-desc">Interactive ordinal plot of prototype interventions by evidence maturity and claim confidence.</desc>
-            </svg>
-            <div class="axis-caption x-axis">Evidence maturity →</div>
-            <div id="mapKey" class="map-key" aria-label="Map key"></div>
-          </div>
-          <div class="axis-caption y-axis">Assessment confidence →</div>
-        </section>
-
-        <aside class="insight-card" aria-labelledby="insight-title">
-          <span class="mini-label">READ THE MAP</span>
-          <h3 id="insight-title">Confidence is not the same as effect size.</h3>
-          <p>
-            High confidence means the bounded claim is better supported; it does not mean the intervention has a larger effect. Evidence maturity and effect magnitude must remain separate.
-          </p>
-          <div class="principle">
-            <span>CORE PRINCIPLE</span>
-            <strong>Preserve uncertainty.</strong>
-          </div>
-        </aside>
-      </div>
-    </section>
-
-    <section class="library" aria-labelledby="library-title">
-      <div class="section-heading">
         <div>
-          <p class="eyebrow">EVIDENCE LIBRARY</p>
-          <h2 id="library-title">Understand first. Inspect second.</h2>
-        </div>
-        <div class="view-toggle" aria-label="Detail level">
-          <button type="button" class="view-option active" data-view="simple" aria-pressed="true">Simple</button>
-          <button type="button" class="view-option" data-view="detailed" aria-pressed="false">Detailed</button>
+          <h3>Reviewed evidence</h3>
+          <ul class="source-list" id="reviewedSources"></ul>
         </div>
       </div>
-      <div id="cardGrid" class="card-grid" aria-live="polite"></div>
-      <p id="emptyState" class="empty-state" hidden>No reviewed record in this view matches this search.</p>
-    </section>
-
-    <section class="trust-strip" aria-labelledby="trust-strip-title">
-      <div>
-        <p class="eyebrow">TRUST ARCHITECTURE</p>
-        <h2 id="trust-strip-title">Every conclusion should leave a receipt.</h2>
-      </div>
-      <div class="trust-pillars">
-        <div><span>01</span><strong>Source</strong><p>Original public evidence record.</p></div>
-        <div><span>02</span><strong>Claim</strong><p>One bounded statement at a time.</p></div>
-        <div><span>03</span><strong>Limits</strong><p>Uncertainty stays visible.</p></div>
-        <div><span>04</span><strong>Review</strong><p>Changes are versioned and inspectable.</p></div>
-      </div>
+      <dl class="method">
+        <div><dt>Community figures</dt><dd>Recomputed from the published 2022 result table and plotting code.</dd></div>
+        <div><dt>Later image</dt><dd>Described in words only; no values are taken from it.</dd></div>
+        <div><dt>Reviewed claims</dt><dd>Each states one bounded claim with its sources, limitations and review date.</dd></div>
+      </dl>
+      <p class="fine">The map is an original diagram of seven published values. Neither version of the community chart is reproduced.</p>
     </section>
   </main>
 
-  <footer>
-    <div>Nootropics Map · Evidence, visually mapped</div>
-    <div>Source-backed · Versioned · Educational only</div>
+  <footer class="site-footer">
+    <p>Information only. Not medical advice. No diagnosis, treatment, dosing, or personal recommendations.</p>
   </footer>
 
-  <dialog id="detailDialog" class="detail-dialog">
+  <dialog id="detailDialog" class="detail-dialog" aria-labelledby="detailTitle">
     <form method="dialog" class="dialog-shell">
       <button class="dialog-close" aria-label="Close evidence detail">×</button>
       <div id="dialogContent"></div>
-    </form>
-  </dialog>
-
-  <dialog id="trustDialog" class="detail-dialog compact-dialog">
-    <form method="dialog" class="dialog-shell">
-      <button class="dialog-close" aria-label="Close trust explanation">×</button>
-      <p class="eyebrow">WHY TRUST THIS?</p>
-      <h2>Trust the trace, not the aesthetic.</h2>
-      <p class="dialog-lede">The interface is presentation. Structured evidence records are the system of record.</p>
-      <div class="trust-list">
-        <div><strong>Source-first</strong><p>Material claims map to structured source IDs.</p></div>
-        <div><strong>Qualified</strong><p>Claim status and limitations are displayed independently.</p></div>
-        <div><strong>Versionable</strong><p>Evidence changes are designed to be reviewed as Git diffs.</p></div>
-        <div><strong>Bounded</strong><p>No personalized diagnosis, treatment, dosing, or medication-change instructions.</p></div>
-      </div>
-    </form>
-  </dialog>
-
-  <dialog id="methodDialog" class="detail-dialog compact-dialog">
-    <form method="dialog" class="dialog-shell">
-      <button class="dialog-close" aria-label="Close methodology">×</button>
-      <p class="eyebrow">METHOD</p>
-      <h2>Separate reputation, self-report, and evidence.</h2>
-      <p class="dialog-lede">
-        v0.1 uses intentionally coarse evidence bands. “Nootropics” is the public front door; inclusion is not proof of enhancement, safety, or a recommendation.
-      </p>
-      <ol class="method-steps">
-        <li><span>1</span><div><strong>Source</strong><p>Capture provenance without copying protected full text.</p></div></li>
-        <li><span>2</span><div><strong>Bound the claim</strong><p>One reviewable statement with explicit limitations.</p></div></li>
-        <li><span>3</span><div><strong>Assess</strong><p>Record status and confidence for that exact claim.</p></div></li>
-        <li><span>4</span><div><strong>Render</strong><p>Explain simply, then expose the evidence receipt.</p></div></li>
-      </ol>
     </form>
   </dialog>
 

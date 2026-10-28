@@ -17,4 +17,6 @@ Museum calm + laboratory rigor.
 
 ## Signature interaction
 
-The Evidence Maturity × Confidence map lets users see two reviewable dimensions without implying effect size. It is explicitly ordinal and educational—not a clinical scoring system. A future Signal layer must not ship until it has its own source-backed provenance.
+The community map shows how the published 2022 chart works: number of ratings against the reported chance of a life-changing rating, on logarithmic axes, with the published regions and a few cited items drawn with their model intervals. It is an original diagram, not a reproduction of either version of the chart.
+
+The evidence check then shows evidence maturity and confidence for each reviewed claim as two separate ordinal measures, without implying effect size. A quantitative Community Signal layer must not ship until it has its own source-backed provenance.

@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.4.0 — 2026-10-28
+
+- Rebuilt the public experience as one page ordered around the community chart: community map, what stands out, two snapshots, data about the data, evidence check, and sources. The first screen leads with the question and the map.
+- Added an original community map: number of ratings against the reported chance of a life-changing rating on logarithmic axes, the published plotting regions (18 and 20 of the 116 plotted items), and seven cited 2022 items with their model intervals, plus a table of every value shown. Neither version of the community chart is reproduced.
+- Replaced the 47-idea guided reading with seven observations, including behaviors ranking among compounds, weightlifting above every supplement and every other behavior, caffeine's volume without high reported impact, familiar supplements in the common, rarely life-changing region, and Doing Math in the later image.
+- Presented the published 2022 analysis and the later supplied image as two snapshots. Doing Math is described as one of the most prominent labels in the later image, with no values assigned to it.
+- Reduced data about the data to its figures: 125 → 116 plotted, ρ ≈ 0.14, and about 4× wider intervals for sparse items.
+- Kept the five reviewed evidence records, with claims, maturity, confidence, limitations, safety context, sources, and review dates, as a secondary evidence check with record links.
+- Simplified search labels to Reviewed, Related evidence, 2022 chart, Later image, and Not in the current index.
+- Removed product and process language from the public page and replaced visitor-directed advice with a neutral information-only line.
+- The former guided-reading URL now redirects old section links into the main page.
+- Replaced the undefined “chance of a 10” wording with “life-changing probability”, defined once under the map.
+- Reworded the Physical activity summary to neutral, impersonal wording. Claims, sources, limitations and assessments are unchanged; no upstream raw community dataset imported.
+
 ## 0.3.0 — 2026-10-27
 
 - Added source-aware search with five states: reviewed record, broader reviewed record, published 2022 community source, later supplied image, and not mapped in this release. An exact reviewed record and a broader reviewed relationship (for example, Weightlifting → Physical activity) each open the reviewed record. Source-only terms explain their source state without offering a record action.
