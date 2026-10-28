@@ -52,7 +52,7 @@ def main() -> int:
     if 'id="reviewNote"' not in html or 'id="communityMap"' not in html:
         return fail("community map or review note missing")
     visible = " ".join(html_lib.unescape(re.sub(r"<[^>]+>", " ", html)).split())
-    if "What changes the mind? Follow the evidence." not in visible:
+    if "What changes the mind? Reported life-changing impact across behaviors, supplements and other interventions." not in visible:
         return fail("visible hero copy mismatch")
     canonical = "https://luckygithub777.github.io/nootropics-map/"
     if f'rel="canonical" href="{canonical}"' not in html or "social-preview.png" not in html:

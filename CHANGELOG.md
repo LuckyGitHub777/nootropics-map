@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.2 — 2026-10-28
+
+- Unified the public experience around one community chart: community map → what stands out → evidence check → sources.
+- Removed the dataset, chart-version and snapshot narration from the public page, including the comparison section and the data-about-the-data section that depended on it. Old links to those sections now open the map or the observations.
+- Doing Math is now an ordinary chart item: named alongside other behaviors in one observation, with no feature card, badge or figure.
+- Simplified search to four results: reviewed evidence, related evidence, chart item, and no matching entry. Every chart-only term, Doing Math included, resolves the same way.
+- Removed figures tied to one particular result-table state from the visitor journey (participant totals, plotted-item counts, the rank correlation and the interval-width comparison); no replacement statistics were added.
+- Headings now describe the information plainly: the hero asks "What changes the mind?", the evidence section is titled "Reviewed evidence", and observations avoid editorial phrasing.
+- Aligned share metadata and the social preview with the informational public copy.
+- No changes to reviewed evidence records, sources, assessments or safety boundaries.
+
 ## 0.4.1 — 2026-10-28
 
 - Removed public wording that depended on prior context, such as references to the chart having changed, to snapshots, or to an internal index.
