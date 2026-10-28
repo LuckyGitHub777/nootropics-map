@@ -25,6 +25,15 @@ BANNED_PHRASES = ["system of record", "git", "pull request", "required check", "
                   "guided reading", "talk to a clinician", "clinician", "receipt", "pathway",
                   # Undefined scale jargon and over-broad provenance claims.
                   "chance of a 10", "of a 10", "rarely a 10", "often a 10", "every number on this page"]
+# Zero-context rule: no visitor-facing string may assume another image is visible, or describe how the site,
+# its sources or its search machinery came to be. Checked across visible text, screen-reader text, attributes,
+# share metadata, generated search copy and the compatibility page.
+CONTEXT_LEAKS = ["the chart changed", "two snapshots", "about the two snapshots", "doing math appears",
+                 "doing math changes how the chart reads", "later supplied image", "supplied", "source state",
+                 "published state", "snapshot", "current index", "current release", "upstream dataset", "upstream",
+                 "visibly different places", "undocumented", "neither version", "has moved", "no reviewed record yet",
+                 "new ratings"]
+CONTEXT_REQUIRED = ["Published data vs. later image", "Published 2022 data", "underlying data is unavailable"]
 SECOND_PERSON = re.compile(r"\b(you|your|yours|yourself)\b", re.I)
 
 # Published 2022 community analysis: the seven cited values (result table, verified 2026-10-28 against
@@ -41,7 +50,7 @@ CITED = {
 # Facts stated in the insights, each derived from the citation set or the published plotting code.
 INSIGHT_FACTS = ["top ten of 125 items", "Weightlifting ranks third", "Third of 125 items at 0.121", "2,553 ratings",
                  "more than any other item", "0.030", "956 to 1,322 ratings", "ρ ≈ 0.14", "fewer than 50 ratings", "about four times wider",
-                 "500 or more", "Doing Math", "The chart changed."]
+                 "500 or more", "Doing Math", "absent from the published 2022 dataset"]
 DATA_FACTS = ["125", "116", "125 result-table items · 116 plotted", "ρ ≈ 0.14", "Popularity barely tracks reported transformation.",
               "≈4×", "≈0.048", "≈0.012", "≈3.9×", "Sparse estimates are much less precise.", "20 items in each group",
               "More ratings improve precision. They do not turn self-report into an experiment."]
@@ -123,12 +132,13 @@ console.log(JSON.stringify(cases.map((q) => {
 SEARCH_MATRIX = [
     ("Creatine", "reviewed", ["Reviewed", "Creatine", "claim, limitations and sources", "Different questions."], []),
     ("Weightlifting", "broader", ["Related evidence", "Physical activity", "broader than the searched term"], ["agree", "confirm", "contradict"]),
-    ("Caffeine", "published-2022", ["2022 chart", "published 2022 community analysis", "No reviewed record", "not evidence of efficacy or safety"], []),
+    ("Caffeine", "published-2022", ["2022 chart", "published 2022 community analysis", "no reviewed record", "not evidence of efficacy or safety"], ["yet"]),
     ("Omega-3", "published-2022", ["2022 chart", "Omega-3"], []),
-    ("Doing Math", "later-image", ["Later image", "later supplied image", "separate from the published 2022 analysis", "undocumented"],
-     ["36,163", "2,802", "rating", "0."]),
-    ("Charlie Sheen", "not-mapped", ["Not in the current index", "not a complete inventory of the upstream dataset"],
-     ["not in the source", "does not exist", "no evidence exists", "release"]),
+    ("Doing Math", "later-image", ["Later image", "Doing Math appears in a separate later image but not in the published 2022 dataset.",
+                                   "underlying data is unavailable, so no numerical comparison is made"],
+     ["36,163", "2,802", "rating", "0.", "rank", "probability", "supplied", "undocumented", "snapshot"]),
+    ("Charlie Sheen", "not-mapped", ["No matching entry", "Search includes the reviewed evidence and selected chart labels shown on this page."],
+     ["not in the source", "does not exist", "no evidence exists", "release", "index", "upstream", "dataset"]),
     ("  cReAtInE  ", "reviewed", ["Creatine"], []),
     ("creat", "reviewed", ["Creatine"], []),
     ("WEIGHT", "broader", ["Physical activity"], []),
@@ -245,7 +255,7 @@ def check_copy(html: str, app: str) -> list[str]:
         shown = json.dumps(json.loads((ROOT / "data" / name).read_text(encoding="utf-8")), ensure_ascii=False)
         if SECOND_PERSON.search(shown):
             errors.append(f"data/{name} addresses the reader")
-    for label in ["Life-changing probability", "Seven things that stand out", "All community-chart figures on this page come from this published state",
+    for label in ["Life-changing probability", "Seven things that stand out", "All community-chart figures on this page are derived from the published 2022 data.",
                   "Life-changing probability is the modeled share of ratings at the top of the scale"]:
         if label not in page:
             errors.append(f"plain-language label missing: {label!r}")
@@ -286,9 +296,16 @@ def check_copy(html: str, app: str) -> list[str]:
         errors.append("no data-about-data figure may describe the later image")
     snap = re.search(r'<section class="chapter" id="snapshots".*?</section>', html, re.S).group(0)
     snap_text = html_lib.unescape(" ".join(re.sub(r"<[^>]+>", " ", snap).split()))
-    for needle in ["Published 2022", "Later supplied image", "125", "116", "Doing Math", "undocumented", "no numbers are taken from it"]:
+    for needle in ["Published data vs. later image", "Published 2022 data", "Public table and reproducible values",
+                   "Later image · underlying data unavailable", "Additional labels, no public dataset", "125", "116", "Doing Math",
+                   "116 plotted under the published code’s inclusion filter",
+                   "A separate later image contains labels that are not present in the published 2022 dataset.",
+                   "Its underlying data is unavailable, so no numerical values are taken from it."]:
         if needle not in snap_text:
-            errors.append(f"two-snapshot distinction missing: {needle!r}")
+            errors.append(f"published-data vs. later-image distinction missing: {needle!r}")
+    # The plotting filter is on a subset of ratings, not total count: never restate it as a total-rating threshold.
+    if re.search(r"more than 10\b|over 10 ratings|at least 1[01] ratings", snap_text, re.I):
+        errors.append("the plotting filter must not be restated as a total-rating threshold")
     # Doing Math never carries a figure: every sentence that names it is free of digits other than the year 2022.
     vp = Inspector()
     vp.feed(html)
@@ -304,6 +321,42 @@ def check_copy(html: str, app: str) -> list[str]:
             errors.append(f"{label} missing")
         elif re.search(r"\d", html_lib.unescape(re.sub(r"<[^>]+>", " ", m.group(0))).replace("2022", "")):
             errors.append(f"{label} carries a number; the later image has no documented values")
+        else:
+            text = html_lib.unescape(" ".join(re.sub(r"<[^>]+>", " ", m.group(0)).split())).lower()
+            # No rank, position or probability, and nothing implying the later data can be read.
+            for word in ["rank", "top", "most", "upper", "lower", "left", "right", "probab", "%", "rating", "coordinate",
+                         "data is available", "dataset is available", "data are available"]:
+                if re.search(rf"(?<![a-z]){re.escape(word)}", text):
+                    errors.append(f"{label} implies a rank, position, figure or available data: {word!r}")
+            if "underlying data is unavailable" not in text:
+                errors.append(f"{label} must say the later image's underlying data is unavailable")
+    insight = re.search(r'<li class="insight insight-feature">.*?</li>', html, re.S)
+    if insight and "separate later image" not in insight.group(0):
+        errors.append("the Doing Math observation must explain the later image on its own, before the comparison section")
+    return errors
+
+
+def public_surface(html: str) -> str:
+    """Every string a visitor, screen reader or share card can meet: text, sr-only text and attribute values."""
+    html = re.sub(r"<!--.*?-->|<(script|style)\b[^>]*>.*?</\1>", " ", html, flags=re.S)
+    attrs = re.findall(r'\b(?:content|alt|title|aria-label|placeholder|value)="([^"]*)"', html)
+    text = re.sub(r"<[^>]+>", " ", html)
+    return html_lib.unescape(" ".join((text + " " + " ".join(attrs)).split()))
+
+
+def check_context(html: str, app: str) -> list[str]:
+    errors: list[str] = []
+    explore = (WEB / "explore.html").read_text(encoding="utf-8")
+    surface = public_surface(html) + " " + public_surface(explore) + " " + js_user_strings(app)
+    low = surface.lower()
+    for phrase in CONTEXT_LEAKS:
+        if re.search(rf"(?<![a-z]){re.escape(phrase)}", low):
+            errors.append(f"context-dependent public copy: {phrase!r}")
+    for phrase in CONTEXT_REQUIRED:
+        if phrase not in surface:
+            errors.append(f"self-contained source explanation missing: {phrase!r}")
+    if "doing math" in (re.search(r'placeholder="([^"]*)"', html) or [None, ""])[1].lower():
+        errors.append("the search placeholder must use familiar examples, not the later-image label")
     return errors
 
 
@@ -380,6 +433,7 @@ def main() -> int:
     if 'href="./explore.html"' in html:
         errors.append("the main page must not link to the compatibility route")
     errors += check_copy(html, app)
+    errors += check_context(html, app)
     errors += check_community_map(app, html)
     errors += check_search(html, app)
     errors += check_readability()
