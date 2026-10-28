@@ -1,23 +1,25 @@
 (() => {
   'use strict';
 
-  const state = {
-    interventions: [],
-    claims: [],
-    sources: [],
-    category: 'all',
-    query: '',
-    view: 'simple'
-  };
+  const state = { interventions: [], claims: [], sources: [], query: '' };
 
-  const evidenceRank = { emerging: 1, moderate: 2, strong: 3 };
-  const confidenceRank = { unknown: 1, low: 1, moderate: 2, high: 3 };
-  const evidenceLabel = { emerging: 'Emerging evidence', moderate: 'Moderate evidence', strong: 'Strong evidence' };
-  const pointStyle = {
-    emerging: { stroke: '#827d73', fill: '#827d73' },
-    moderate: { stroke: '#9e9a8f', fill: '#9e9a8f' },
-    strong: { stroke: '#d9c8a2', fill: '#d9c8a2' }
-  };
+  // Published 2022 community analysis (result table and plotting code). Seven cited values, not the dataset.
+  // count = total ratings; p = modeled probability of a rating of 10; lo/hi = published model interval.
+  const COMMUNITY_EXAMPLES = [
+    { name: 'Weightlifting', count: 567, p: 0.121, lo: 0.093, hi: 0.153 },
+    { name: 'Trying to get more sleep', count: 993, p: 0.075, lo: 0.060, hi: 0.093 },
+    { name: 'Meditation', count: 429, p: 0.066, lo: 0.046, hi: 0.093 },
+    { name: 'Caffeine', count: 2553, p: 0.030, lo: 0.025, hi: 0.037 },
+    { name: 'Creatine', count: 1153, p: 0.014, lo: 0.010, hi: 0.020 },
+    { name: 'Theanine', count: 1322, p: 0.013, lo: 0.009, hi: 0.018 },
+    { name: 'Omega-3', count: 956, p: 0.010, lo: 0.006, hi: 0.014 }
+  ];
+  // Published plotting-code regions over the 116 plotted items.
+  const REGIONS = { countSplit: 300, pSplit: 0.02, uncommonOften: 18, commonRarely: 20, elsewhere: 78 };
+
+  const confidenceRank = { unknown: 0, low: 1, moderate: 2, high: 3 };
+  const bandRank = { emerging: 1, moderate: 2, strong: 3 };
+  const titleCase = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
   // search-resolution:start
   // Search context is navigation metadata, not evidence. Reviewed evidence comes only from data/*.json.
@@ -26,15 +28,16 @@
   // and this list is deliberately not an inventory of either source.
   const SOURCE_CONTEXT = [
     { term: 'Creatine', source: 'published-2022', reviewed: 'creatine', relation: 'exact',
-      note: 'Raters were asked how it felt, while the reviewed claim concerns strength, power and repeated high-intensity effort. The two answer different questions.' },
+      note: 'Raters judged its felt effect; the reviewed claim concerns strength and power. Different questions.' },
     { term: 'Meditation', source: 'published-2022', reviewed: 'meditation', relation: 'exact' },
     { term: 'Weightlifting', aliases: ['weight lifting'], source: 'published-2022', reviewed: 'physical-activity', relation: 'broader' },
     { term: 'Caffeine', source: 'published-2022' },
     { term: 'Theanine', aliases: ['l-theanine'], source: 'published-2022' },
+    { term: 'Omega-3', aliases: ['omega 3'], source: 'published-2022' },
     { term: 'Doing Math', source: 'later-image' }
   ];
   const REVIEWED_ALIASES = { 'physical-activity': ['exercise'] };
-  const SOURCE_STATE_LINK = './explore.html#sourceState';
+  const SNAPSHOTS_LINK = '#snapshots';
 
   const normalizeQuery = (text = '') => String(text).normalize('NFKD').replace(/[̀-ͯ]/g, '')
     .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
@@ -77,50 +80,46 @@
       case 'reviewed': {
         const many = result.items.length > 1;
         return {
-          label: many ? 'Reviewed records' : 'Reviewed record',
+          label: 'Reviewed',
           title: many ? result.items.map((item) => item.name).join(' · ') : first.name,
-          body: many
-            ? 'Reviewed Nootropics Map records match this search. Each evidence receipt states one bounded claim, its limitations and its sources.'
-            : 'A reviewed Nootropics Map record exists. Its evidence receipt is the authoritative claim here, with its limitations and sources.',
-          secondary: c
-            ? `${c.term} also appears in the published 2022 community analysis as self-reported experience, kept separate from the reviewed claim.${c.note ? ` ${c.note}` : ''}`
-            : '',
-          actions: result.items.map((item) => ({ slug: item.slug, text: `Open the ${item.name} record` })),
+          body: 'A reviewed record with its claim, limitations and sources.',
+          secondary: c ? `Also in the 2022 chart.${c.note ? ` ${c.note}` : ''}` : '',
+          actions: result.items.map((item) => ({ slug: item.slug, text: `Open ${item.name}` })),
           link: null
         };
       }
       case 'broader':
         return {
-          label: 'Broader reviewed record',
-          title: `Closest reviewed record: ${first.name}`,
-          body: `There is no reviewed record for ${c.term} itself. The ${first.name} record is broader than the searched term: its claim is about ${first.name.toLowerCase()} in general, not ${c.term.toLowerCase()} specifically.`,
-          secondary: `${c.term} also appears in the published 2022 community analysis as self-reported experience. That signal and the reviewed claim measure different outcomes, so they are not compared here.`,
-          actions: [{ slug: first.slug, text: `Open the ${first.name} record` }],
-          link: { href: SOURCE_STATE_LINK, text: 'How the source states differ' }
+          label: 'Related evidence',
+          title: `${c.term} → ${first.name}`,
+          body: `No record for ${c.term} itself. The ${first.name} record is broader than the searched term.`,
+          secondary: `${c.term} is in the 2022 chart. The chart and the claim measure different outcomes.`,
+          actions: [{ slug: first.slug, text: `Open ${first.name}` }],
+          link: { href: SNAPSHOTS_LINK, text: 'About the two snapshots' }
         };
       case 'published-2022':
         return {
-          label: 'Published 2022 community source',
+          label: '2022 chart',
           title: c.term,
-          body: `${c.term} appears in the published 2022 community analysis. There is no reviewed Nootropics Map record for it yet.`,
-          secondary: 'Community ratings are self-reported experience: source context, not evidence of efficacy or safety.',
+          body: `${c.term} appears in the published 2022 community analysis. No reviewed record yet.`,
+          secondary: 'Self-reported ratings: not evidence of efficacy or safety.',
           actions: [],
-          link: { href: SOURCE_STATE_LINK, text: 'How the source states differ' }
+          link: { href: SNAPSHOTS_LINK, text: 'About the two snapshots' }
         };
       case 'later-image':
         return {
-          label: 'Later supplied image',
+          label: 'Later image',
           title: c.term,
-          body: `${c.term} appears only in the later supplied chart image, separate from the published 2022 analysis, and is absent from its result table.`,
-          secondary: `The dataset behind the later image has not been published, and there is no reviewed Nootropics Map record for ${c.term}.`,
+          body: `${c.term} appears only in the later supplied image, separate from the published 2022 analysis.`,
+          secondary: 'Its data is undocumented, so no figures apply. No reviewed record.',
           actions: [],
-          link: { href: SOURCE_STATE_LINK, text: 'How the source states differ' }
+          link: { href: SNAPSHOTS_LINK, text: 'About the two snapshots' }
         };
       case 'not-mapped':
         return {
-          label: 'Not mapped in this release',
+          label: 'Not in the current index',
           title: `“${result.query}”`,
-          body: 'Search covers reviewed records and selected source context currently mapped by Nootropics Map; it is not a complete inventory of the upstream dataset.',
+          body: 'Search covers reviewed records and selected chart items; it is not a complete inventory of the upstream dataset.',
           secondary: '',
           actions: [],
           link: null
@@ -132,8 +131,6 @@
   // search-resolution:end
 
   const $ = (sel) => document.querySelector(sel);
-  const $$ = (sel) => [...document.querySelectorAll(sel)];
-
   const claimById = (id) => state.claims.find((item) => item.id === id);
   const sourceById = (id) => state.sources.find((item) => item.id === id);
   const itemBySlug = (slug) => state.interventions.find((item) => item.slug === slug);
@@ -147,246 +144,196 @@
     if (!claims.length) return 'unknown';
     return claims.map((claim) => claim.confidence).sort((a, b) => confidenceRank[a] - confidenceRank[b])[0];
   };
+  const el = (tag, className, text) => {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  };
+  const svgEl = (tag, attrs = {}, text) => {
+    const node = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    Object.entries(attrs).forEach(([k, v]) => node.setAttribute(k, v));
+    if (text !== undefined) node.textContent = text;
+    return node;
+  };
+  const fmtCount = (n) => n.toLocaleString('en-US');
+  const fmtP = (p) => p.toFixed(3);
 
-  function sanitize(text = '') {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+  // ---------- Community map (original diagram of seven published values) ----------
+  function renderCommunityMap() {
+    const svg = $('#communityMap');
+    const compact = window.matchMedia('(max-width: 650px)').matches;
+    svg.querySelectorAll(':scope > :not(title):not(desc)').forEach((node) => node.remove());
+    const W = compact ? 360 : 960;
+    const H = compact ? 420 : 560;
+    const m = compact ? { l: 68, r: 14, t: 18, b: 58 } : { l: 92, r: 40, t: 26, b: 74 };
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    const xMin = compact ? 100 : 10;
+    const xMax = 4000;
+    const yMin = 0.004;
+    const yMax = 0.2;
+    const x = (v) => m.l + (Math.log10(v / xMin) / Math.log10(xMax / xMin)) * (W - m.l - m.r);
+    const y = (v) => H - m.b - (Math.log10(v / yMin) / Math.log10(yMax / yMin)) * (H - m.t - m.b);
+
+    // Published regions.
+    const xs = x(REGIONS.countSplit);
+    const ys = y(REGIONS.pSplit);
+    svg.appendChild(svgEl('rect', { x: m.l, y: m.t, width: xs - m.l, height: ys - m.t, class: 'region region-often' }));
+    svg.appendChild(svgEl('rect', { x: xs, y: ys, width: W - m.r - xs, height: H - m.b - ys, class: 'region region-rarely' }));
+    svg.appendChild(svgEl('line', { x1: xs, x2: xs, y1: m.t, y2: H - m.b, class: 'split' }));
+    svg.appendChild(svgEl('line', { x1: m.l, x2: W - m.r, y1: ys, y2: ys, class: 'split' }));
+    const regionText = compact
+      ? [[`${REGIONS.uncommonOften} items`, (m.l + xs) / 2, m.t + 18, 'middle'], [`${REGIONS.commonRarely} items`, W - m.r - 8, H - m.b - 12, 'end']]
+      : [[`Uncommon, often a 10 · ${REGIONS.uncommonOften} items`, m.l + 14, m.t + 24, 'start'], [`Common, rarely a 10 · ${REGIONS.commonRarely} items`, W - m.r - 14, H - m.b - 16, 'end']];
+    regionText.forEach(([text, tx, ty, anchor]) => svg.appendChild(svgEl('text', { x: tx, y: ty, 'text-anchor': anchor, class: 'region-label' }, text)));
+
+    // Axes.
+    (compact ? [100, 1000] : [10, 100, 1000]).forEach((v) => {
+      svg.appendChild(svgEl('line', { x1: x(v), x2: x(v), y1: m.t, y2: H - m.b, class: 'grid' }));
+      svg.appendChild(svgEl('text', { x: x(v), y: H - m.b + 22, 'text-anchor': 'middle', class: 'tick' }, fmtCount(v)));
+    });
+    [0.01, 0.03, 0.1].forEach((v) => {
+      svg.appendChild(svgEl('line', { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v), class: 'grid' }));
+      svg.appendChild(svgEl('text', { x: m.l - (compact ? 7 : 10), y: y(v) + 4, 'text-anchor': 'end', class: 'tick' }, String(v)));
+    });
+    svg.appendChild(svgEl('text', { x: (m.l + W - m.r) / 2, y: H - (compact ? 14 : 20), 'text-anchor': 'middle', class: 'axis-title' }, 'Number of ratings →'));
+    const yt = svgEl('text', { x: 0, y: 0, 'text-anchor': 'middle', class: 'axis-title', transform: `translate(${compact ? 13 : 26} ${(m.t + H - m.b) / 2}) rotate(-90)` }, compact ? 'Chance of a 10 →' : 'Reported life-changing probability →');
+    svg.appendChild(yt);
+
+    // Points with intervals and direct labels (desktop) or index numbers (compact).
+    const labelSide = { 'Weightlifting': 'left', 'Trying to get more sleep': 'right', 'Meditation': 'left', 'Caffeine': 'left', 'Creatine': 'left', 'Theanine': 'right', 'Omega-3': 'left' };
+    const labelDy = { 'Weightlifting': -2, 'Meditation': 4, 'Trying to get more sleep': 4, 'Creatine': -14, 'Theanine': 8, 'Omega-3': 6, 'Caffeine': 4 };
+    const compactDy = { 'Creatine': -11, 'Theanine': 4, 'Omega-3': 3 };
+    COMMUNITY_EXAMPLES.forEach((d, i) => {
+      const cx = x(d.count);
+      const cy = y(d.p);
+      const g = svgEl('g', { class: 'point' });
+      g.appendChild(svgEl('line', { x1: cx, x2: cx, y1: y(d.hi), y2: y(d.lo), class: 'interval' }));
+      g.appendChild(svgEl('circle', { cx, cy, r: compact ? 4.5 : 5.5, class: 'dot' }));
+      const left = labelSide[d.name] === 'left';
+      if (compact) {
+        g.appendChild(svgEl('text', { x: left ? cx - 9 : cx + 9, y: cy + 4.5 + (compactDy[d.name] ?? (labelDy[d.name] || 0) / 2), 'text-anchor': left ? 'end' : 'start', class: 'dot-index' }, String(i + 1)));
+      } else {
+        g.appendChild(svgEl('text', { x: left ? cx - 12 : cx + 12, y: cy + 4 + (labelDy[d.name] || 0), 'text-anchor': left ? 'end' : 'start', class: 'point-label' }, d.name));
+      }
+      svg.appendChild(g);
+    });
+  }
+
+  function renderMapKey() {
+    const body = $('#mapKeyBody');
+    body.replaceChildren();
+    COMMUNITY_EXAMPLES.forEach((d, i) => {
+      const tr = el('tr');
+      tr.append(el('td', 'key-index', String(i + 1)), el('th', 'key-name', d.name), el('td', 'key-num', fmtCount(d.count)), el('td', 'key-num', fmtP(d.p)));
+      tr.querySelector('th').setAttribute('scope', 'row');
+      body.appendChild(tr);
+    });
+  }
+
+  // ---------- Evidence check ----------
+  function meter(label, level, word) {
+    const wrap = el('span', 'meter');
+    wrap.setAttribute('aria-label', `${label}: ${word}`);
+    wrap.appendChild(el('span', 'meter-label', label));
+    const dots = el('span', 'meter-dots');
+    dots.setAttribute('aria-hidden', 'true');
+    for (let n = 1; n <= 3; n += 1) dots.appendChild(el('i', n <= level ? 'on' : ''));
+    wrap.append(dots, el('span', 'meter-word', word));
+    return wrap;
   }
 
   function matchingItems() {
-    const q = state.query.trim().toLowerCase();
-    return state.interventions.filter((item) => {
-      const categoryMatch = state.category === 'all' || item.category === state.category;
-      const haystack = [item.name, item.category, item.simple_summary, item.detailed_summary].join(' ').toLowerCase();
-      return categoryMatch && (!q || haystack.includes(q));
-    });
+    const q = normalizeQuery(state.query);
+    if (!q) return state.interventions;
+    return state.interventions.filter((item) => normalizeQuery([item.name, item.category, item.simple_summary].join(' ')).includes(q));
   }
 
-  function renderCards() {
+  function renderEvidence() {
+    const list = $('#evidenceList');
     const items = matchingItems();
-    const grid = $('#cardGrid');
-    grid.innerHTML = '';
-    renderEmptyState(items.length);
-
+    list.replaceChildren();
+    $('#emptyState').hidden = items.length !== 0;
     items.forEach((item) => {
-      const claims = item.claim_ids.map(claimById).filter(Boolean);
-      const button = document.createElement('article');
-      button.className = 'evidence-card';
-      button.tabIndex = 0;
-      button.setAttribute('role', 'button');
-      button.setAttribute('aria-label', `Open evidence for ${item.name}`);
-      const summary = state.view === 'simple' ? item.simple_summary : item.detailed_summary;
-      button.innerHTML = `
-        <div class="card-top">
-          <span class="category-tag">${sanitize(item.category)}</span>
-          <span class="band-badge">${sanitize(evidenceLabel[item.evidence_band])}</span>
-        </div>
-        <h3>${sanitize(item.name)}</h3>
-        <p class="card-summary">${sanitize(summary)}</p>
-        <div class="card-foot">
-          <span>${claims.length} evidence receipt${claims.length === 1 ? '' : 's'}</span>
-          <strong>Inspect →</strong>
-        </div>`;
-      button.addEventListener('click', () => openDetail(item));
-      button.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          openDetail(item);
-        }
-      });
-      grid.appendChild(button);
-    });
-  }
-
-  function svgEl(tag, attrs = {}) {
-    const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
-    Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
-    return el;
-  }
-
-  function renderMap() {
-    const svg = $('#evidenceMap');
-    const mapKey = $('#mapKey');
-    const items = matchingItems();
-    const compact = window.matchMedia('(max-width: 650px)').matches;
-    svg.replaceChildren();
-    mapKey.replaceChildren();
-
-    const width = compact ? 360 : 900;
-    const height = compact ? 470 : 520;
-    const margins = compact
-      ? { left: 58, right: 28, top: 46, bottom: 68 }
-      : { left: 90, right: 70, top: 58, bottom: 70 };
-    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-
-    const innerW = width - margins.left - margins.right;
-    const innerH = height - margins.top - margins.bottom;
-    const xFor = (rank) => margins.left + ((rank - 1) / 2) * innerW;
-    const yFor = (rank) => margins.top + innerH - ((rank - 1) / 2) * innerH;
-
-    [1,2,3].forEach((rank) => {
-      const x = xFor(rank);
-      const y = yFor(rank);
-      svg.appendChild(svgEl('line', { x1:x, x2:x, y1:margins.top, y2:height-margins.bottom, class:'grid-line' }));
-      svg.appendChild(svgEl('line', { x1:margins.left, x2:width-margins.right, y1:y, y2:y, class:'grid-line' }));
-    });
-
-    [['Emerging',1],['Moderate',2],['Strong',3]].forEach(([label,rank]) => {
-      const t = svgEl('text', { x:xFor(rank), y:height-(compact ? 24 : 28), 'text-anchor':'middle', class:'axis-label' });
-      t.textContent = label;
-      svg.appendChild(t);
-    });
-    [['Low',1],['Moderate',2],['High',3]].forEach(([label,rank]) => {
-      const t = svgEl('text', { x:compact ? 31 : 52, y:yFor(rank)+4, 'text-anchor':'middle', class:'axis-label' });
-      t.textContent = label;
-      svg.appendChild(t);
-    });
-
-    const collisions = new Map();
-    const compactOffsets = [
-      { x:-24, y:22 }, { x:-72, y:22 }, { x:-24, y:72 }, { x:-72, y:72 },
-      { x:-48, y:47 }, { x:-96, y:47 }, { x:-24, y:122 }, { x:-72, y:122 }
-    ];
-    const desktopOffsets = [
-      { x:-30, y:22 }, { x:-30, y:82 }, { x:-180, y:22 }, { x:-180, y:82 },
-      { x:-105, y:52 }, { x:-255, y:22 }, { x:-255, y:82 }, { x:-105, y:112 }
-    ];
-    const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-
-    items.forEach((item, itemIndex) => {
-      const xRank = evidenceRank[item.evidence_band];
       const confidence = confidenceFor(item);
-      const yRank = confidenceRank[confidence];
-      const key = `${xRank}:${yRank}`;
-      const index = collisions.get(key) || 0;
-      collisions.set(key, index + 1);
-
-      let x;
-      let y;
-      if (compact) {
-        const offset = compactOffsets[index] || { x:-48, y:122 + (index - compactOffsets.length + 1) * 36 };
-        const radius = 17;
-        x = clamp(xFor(xRank) + offset.x, margins.left + radius, width - margins.right - radius);
-        y = clamp(yFor(yRank) + offset.y, margins.top + radius, height - margins.bottom - radius);
-      } else {
-        const offset = desktopOffsets[index] || { x:-105 - (index - desktopOffsets.length + 1) * 45, y:112 };
-        const radius = 15;
-        x = clamp(xFor(xRank) + offset.x, margins.left + radius, width - margins.right - radius);
-        y = clamp(yFor(yRank) + offset.y, margins.top + radius, height - margins.bottom - radius);
-      }
-
-      const style = pointStyle[item.evidence_band];
-      const group = svgEl('g', {
-        class:'map-node', tabindex:'0', role:'button',
-        'aria-label':`${item.name}: ${item.evidence_band} evidence maturity, ${confidence} confidence`
-      });
-      group.appendChild(svgEl('circle', { cx:x, cy:y, r:compact ? 17 : 15, class:'node-ring', stroke:style.stroke }));
-      group.appendChild(svgEl('circle', { cx:x, cy:y, r:compact ? 13 : 6, class:'node-core', fill:style.fill }));
-
-      const indexLabel = svgEl('text', { x, y:y+4, 'text-anchor':'middle', class:'node-index' });
-      indexLabel.textContent = String(itemIndex + 1);
-      group.appendChild(indexLabel);
-
-      const labelOnLeft = !compact && xRank === 3;
-      const labelX = labelOnLeft ? x - 22 : x + 22;
-      const labelAnchor = labelOnLeft ? 'end' : 'start';
-      const label = svgEl('text', { x:labelX, y:y-1, 'text-anchor':labelAnchor, class:'node-label' });
-      label.textContent = item.name;
-      group.appendChild(label);
-      const sub = svgEl('text', { x:labelX, y:y+15, 'text-anchor':labelAnchor, class:'node-sublabel' });
-      sub.textContent = item.category;
-      group.appendChild(sub);
-
-      group.addEventListener('click', () => openDetail(item));
-      group.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault(); openDetail(item);
-        }
-      });
-      svg.appendChild(group);
-
-      const keyButton = document.createElement('button');
-      keyButton.type = 'button';
-      keyButton.className = 'map-key-item';
-      keyButton.setAttribute('aria-label', `Open evidence for ${item.name}`);
-      const number = document.createElement('span');
-      number.className = 'map-key-index';
-      number.textContent = String(itemIndex + 1);
-      const copy = document.createElement('span');
-      const name = document.createElement('strong');
-      name.textContent = item.name;
-      const category = document.createElement('small');
-      category.textContent = `${item.category} · ${evidenceLabel[item.evidence_band]}`;
-      copy.append(name, category);
-      keyButton.append(number, copy);
-      keyButton.addEventListener('click', () => openDetail(item));
-      mapKey.appendChild(keyButton);
+      const li = el('li');
+      const button = el('button', 'evidence-row');
+      button.type = 'button';
+      button.setAttribute('aria-label', `${item.name}: ${item.evidence_band} evidence, ${confidence} confidence. Open claim and sources.`);
+      const main = el('span', 'row-main');
+      main.append(el('span', 'row-name', item.name), el('span', 'row-summary', item.simple_summary));
+      button.append(main,
+        meter('Evidence', bandRank[item.evidence_band] || 0, titleCase(item.evidence_band)),
+        meter('Confidence', confidenceRank[confidence] || 0, titleCase(confidence)),
+        el('span', 'row-open', 'Sources →'));
+      button.addEventListener('click', () => openDetail(item));
+      li.appendChild(button);
+      list.appendChild(li);
     });
+  }
 
-    $('#mapStatus').textContent = items.length === state.interventions.length
-      ? 'All evidence records'
-      : `${items.length} matching record${items.length === 1 ? '' : 's'}`;
+  function renderSources() {
+    const list = $('#reviewedSources');
+    list.replaceChildren();
+    state.sources.forEach((source) => {
+      const li = el('li');
+      const a = el('a', '', source.title);
+      a.href = source.url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      li.append(a, el('span', '', [source.publisher, source.publication_date ? source.publication_date.slice(0, 4) : ''].filter(Boolean).join(' · ')));
+      list.appendChild(li);
+    });
   }
 
   function openDetail(item, updateLocation = true) {
     const claims = item.claim_ids.map(claimById).filter(Boolean);
-    const sourceIds = [...new Set(claims.flatMap((claim) => claim.source_ids))];
-    const sources = sourceIds.map(sourceById).filter(Boolean);
-
-    const claimHtml = claims.map((claim) => `
-      <section class="receipt">
-        <span class="receipt-label">Evidence receipt · ${sanitize(claim.id)}</span>
-        <h3>${sanitize(claim.claim)}</h3>
-        <div class="detail-meta">
-          <span class="meta-pill">Status: ${sanitize(claim.status.replaceAll('_',' '))}</span>
-          <span class="meta-pill">Confidence: ${sanitize(claim.confidence)}</span>
-          <span class="meta-pill">Reviewed: ${sanitize(claim.last_reviewed)}</span>
-        </div>
-        <p><strong>What the sources support</strong></p>
-        <ul>${claim.source_claims.map((entry) => `<li><span class="source-claim-id">${sanitize(entry.source_id)}</span> ${sanitize(entry.summary)}</li>`).join('')}</ul>
-        <p><strong>Limitations</strong></p>
-        <ul>${claim.limitations.map((limit) => `<li>${sanitize(limit)}</li>`).join('')}</ul>
-      </section>`).join('');
-
-    const sourceHtml = sources.map((source) => `
-      <a class="source-link" href="${encodeURI(source.url)}" target="_blank" rel="noopener noreferrer">
-        <strong>${sanitize(source.title)}</strong>
-        <span>${sanitize(source.publisher)} · ${sanitize(source.source_type.replaceAll('_',' '))}${source.publication_date ? ` · ${sanitize(source.publication_date)}` : ''}${source.doi ? ` · DOI ${sanitize(source.doi)}` : ''}</span>
-        <small>Source checked ${sanitize(source.retrieved_at)}</small>
-      </a>`).join('');
-
-    $('#dialogContent').innerHTML = `
-      <p class="eyebrow">${sanitize(item.category.toUpperCase())}</p>
-      <h2>${sanitize(item.name)}</h2>
-      <p class="dialog-lede">${sanitize(item.detailed_summary)}</p>
-      <div class="detail-meta">
-        <span class="meta-pill">Evidence: ${sanitize(item.evidence_band)}</span>
-        <span class="meta-pill">Confidence: ${sanitize(confidenceFor(item))}</span>
-        <span class="meta-pill">Reviewed: ${sanitize(item.reviewed_at)}</span>
-      </div>
-      <section class="receipt">
-        <span class="receipt-label">Safety context</span>
-        <p>${sanitize(item.safety_note)}</p>
-      </section>
-      ${claimHtml}
-      <section class="receipt">
-        <span class="receipt-label">Sources</span>
-        <div class="source-list">${sourceHtml}</div>
-      </section>`;
+    const sources = [...new Set(claims.flatMap((claim) => claim.source_ids))].map(sourceById).filter(Boolean);
+    const root = $('#dialogContent');
+    root.replaceChildren();
+    root.append(el('p', 'eyebrow', item.category), Object.assign(el('h2', '', item.name), { id: 'detailTitle' }), el('p', 'dialog-lede', item.detailed_summary));
+    const meta = el('div', 'detail-meta');
+    meta.append(meter('Evidence', bandRank[item.evidence_band] || 0, `Evidence: ${titleCase(item.evidence_band)}`),
+      meter('Confidence', confidenceRank[confidenceFor(item)] || 0, `Confidence: ${titleCase(confidenceFor(item))}`),
+      el('span', 'meta-text', `Reviewed ${item.reviewed_at}`));
+    root.appendChild(meta);
+    claims.forEach((claim) => {
+      const sec = el('section', 'receipt');
+      sec.append(el('p', 'receipt-label', 'Claim'), el('h3', '', claim.claim));
+      sec.append(el('p', 'receipt-label', 'What the sources support'));
+      const ul = el('ul');
+      claim.source_claims.forEach((entry) => ul.appendChild(el('li', '', entry.summary)));
+      sec.appendChild(ul);
+      sec.append(el('p', 'receipt-label', 'Limitations'));
+      const lim = el('ul');
+      claim.limitations.forEach((text) => lim.appendChild(el('li', '', text)));
+      sec.appendChild(lim);
+      root.appendChild(sec);
+    });
+    const safety = el('section', 'receipt');
+    safety.append(el('p', 'receipt-label', 'Safety context'), el('p', '', item.safety_note));
+    root.appendChild(safety);
+    const src = el('section', 'receipt');
+    src.appendChild(el('p', 'receipt-label', 'Sources'));
+    sources.forEach((source) => {
+      const a = el('a', 'source-link');
+      a.href = source.url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.append(el('strong', '', source.title), el('span', '', [source.publisher, source.publication_date, source.doi ? `DOI ${source.doi}` : ''].filter(Boolean).join(' · ')), el('small', '', `Checked ${source.retrieved_at}`));
+      src.appendChild(a);
+    });
+    root.appendChild(src);
     const dialog = $('#detailDialog');
     if (updateLocation) {
       const targetHash = `#${encodeURIComponent(item.slug)}`;
-      if (window.location.hash !== targetHash) {
-        history.pushState({ nootropicsMapDetail: item.slug }, '', targetHash);
-      }
+      if (window.location.hash !== targetHash) history.pushState({ nootropicsMapDetail: item.slug }, '', targetHash);
     }
     if (!dialog.open) dialog.showModal();
   }
 
   function syncDetailFromLocation() {
-    const slug = hashSlug();
-    const item = itemBySlug(slug);
+    const item = itemBySlug(hashSlug());
     const dialog = $('#detailDialog');
     if (item) {
       openDetail(item, false);
@@ -397,6 +344,7 @@
     }
   }
 
+  // ---------- Search ----------
   let announceTimer = null;
   let lastAnnounced = '';
 
@@ -419,35 +367,24 @@
     const secondary = $('#resolutionSecondary');
     secondary.textContent = view.secondary;
     secondary.hidden = !view.secondary;
-
-    const filtered = state.category !== 'all' && view.actions.some((action) => itemBySlug(action.slug)?.category !== state.category);
-    const filterNote = $('#resolutionFilter');
-    filterNote.hidden = !filtered;
-    filterNote.textContent = filtered ? 'The current category filter hides this record from the map and library; the record still opens here.' : '';
-
     const actions = $('#resolutionActions');
     actions.replaceChildren();
     view.actions.forEach((action) => {
       const item = itemBySlug(action.slug);
       if (!item) return;
-      const button = document.createElement('button');
+      const button = el('button', 'resolution-action', `${action.text} →`);
       button.type = 'button';
-      button.className = 'resolution-action';
-      button.textContent = `${action.text} →`;
       button.addEventListener('click', () => openDetail(item));
       actions.appendChild(button);
     });
     if (view.link) {
-      const link = document.createElement('a');
-      link.className = 'resolution-link';
+      const link = el('a', 'resolution-link', view.link.text);
       link.href = view.link.href;
-      link.textContent = view.link.text;
       actions.appendChild(link);
     }
     actions.hidden = !actions.childElementCount;
     panel.hidden = false;
-
-    // Announce once typing settles, and only when the resolved state changes, to keep screen readers quiet.
+    // Announce once typing settles, and only when the resolved state changes.
     const key = `${result.state}|${view.title}`;
     announceTimer = setTimeout(() => {
       if (key === lastAnnounced) return;
@@ -456,76 +393,34 @@
     }, 650);
   }
 
-  function renderEmptyState(count) {
-    const empty = $('#emptyState');
-    empty.hidden = count !== 0;
-    if (count !== 0) return;
-    const view = describeResolution(resolveSearch(state.query, state.interventions));
-    empty.textContent = view && state.query.trim()
-      ? `No reviewed record in this view matches this search. Search result above: ${view.label}.`
-      : 'No reviewed record in this view matches this search.';
-  }
-
-  function update() {
-    renderCards();
-    renderMap();
-    renderResolution();
-  }
-
   function bindEvents() {
     $('#searchInput').addEventListener('input', (event) => {
       state.query = event.target.value;
-      update();
+      renderEvidence();
+      renderResolution();
     });
-
     document.addEventListener('keydown', (event) => {
-      if (event.key === '/' && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) {
-        event.preventDefault(); $('#searchInput').focus();
+      if (event.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        event.preventDefault();
+        $('#searchInput').focus();
       }
     });
-
-    $$('.filter-chip').forEach((button) => button.addEventListener('click', () => {
-      state.category = button.dataset.category;
-      $$('.filter-chip').forEach((chip) => {
-        const active = chip === button;
-        chip.classList.toggle('active', active);
-        chip.setAttribute('aria-pressed', String(active));
-      });
-      update();
-    }));
-
-    $$('.view-option').forEach((button) => button.addEventListener('click', () => {
-      state.view = button.dataset.view;
-      $$('.view-option').forEach((option) => {
-        const active = option === button;
-        option.classList.toggle('active', active);
-        option.setAttribute('aria-pressed', String(active));
-      });
-      renderCards();
-    }));
-
-    $('#trustButton').addEventListener('click', () => $('#trustDialog').showModal());
-    $('#methodButton').addEventListener('click', () => $('#methodDialog').showModal());
-
     const detailDialog = $('#detailDialog');
     detailDialog.addEventListener('close', () => {
       if (syncingLocation) return;
       const slug = hashSlug();
       if (!slug || !itemBySlug(slug)) return;
-      if (history.state?.nootropicsMapDetail === slug) {
-        history.back();
-      } else {
-        history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
-      }
+      if (history.state?.nootropicsMapDetail === slug) history.back();
+      else history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
     });
     window.addEventListener('popstate', syncDetailFromLocation);
     window.addEventListener('hashchange', syncDetailFromLocation);
-
-    const compactQuery = window.matchMedia('(max-width: 650px)');
-    compactQuery.addEventListener('change', () => renderMap());
+    window.matchMedia('(max-width: 650px)').addEventListener('change', renderCommunityMap);
   }
 
   async function load() {
+    renderCommunityMap();
+    renderMapKey();
     try {
       const [interventions, claims, sources] = await Promise.all([
         fetch('../data/interventions.json').then((r) => r.json()),
@@ -535,18 +430,17 @@
       state.interventions = interventions;
       state.claims = claims;
       state.sources = sources;
-      $('#interventionCount').textContent = interventions.length;
-      $('#claimCount').textContent = claims.length;
-      const latestReview = interventions.map((item) => item.reviewed_at).filter(Boolean).sort().at(-1);
-      $('#reviewDate').textContent = latestReview
-        ? new Date(`${latestReview}T00:00:00Z`).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
-        : '—';
+      const latest = interventions.map((item) => item.reviewed_at).filter(Boolean).sort().at(-1);
+      $('#reviewNote').textContent = latest
+        ? `${interventions.length} reviewed records · ${sources.length} sources · reviewed ${new Date(`${latest}T00:00:00Z`).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })}`
+        : '';
       bindEvents();
-      update();
+      renderEvidence();
+      renderSources();
       syncDetailFromLocation();
     } catch (error) {
       console.error(error);
-      $('#cardGrid').innerHTML = '<p class="empty-state">Evidence data could not be loaded. Serve the repository over HTTP rather than opening the file directly.</p>';
+      $('#evidenceList').replaceChildren(el('li', 'empty-state', 'Evidence data could not be loaded.'));
     }
   }
 

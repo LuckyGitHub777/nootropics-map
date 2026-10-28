@@ -2,47 +2,45 @@
 
 The roadmap expands the evidence experience only when provenance, safety, and UX are mature enough to preserve trust.
 
-## v0.1 — Evidence map foundation
+## Shipped
+
+### v0.1 — Evidence map foundation
 
 - structured source, claim, and intervention objects;
-- source → claim traceability and evidence receipts;
-- interactive search and category filters;
-- Evidence Maturity × Confidence visualization;
-- progressive simple → detailed → sources disclosure;
-- source-specific summaries, limitations, review dates, and links;
-- dependency-light static frontend;
-- CI validation and public-boundary checks;
-- reproducible GitHub Pages/custom-domain build.
+- source → claim traceability with limitations and review dates;
+- search and an evidence maturity × confidence view;
+- dependency-light static frontend, CI validation, and a reproducible GitHub Pages build.
 
-## v0.2 — Evidence depth
+### v0.2 — Reading the community chart
 
-- provenance-complete real-world/self-report signal layer;
-- explicit Signal–Evidence Gap view once that dataset exists;
-- contradiction records and agreement/disagreement presentation;
-- outcome-specific evidence states;
-- evidence change history;
-- stronger source-quality and methodology metadata;
-- expert methodology layer alongside the layperson view.
+- a reading of the published 2022 Nootroflix analysis, kept separate from reviewed evidence;
+- the published 2022 analysis and the later supplied chart image treated as separate source states.
 
-## v0.3 — Research navigation
+### v0.3 — Source-aware search and data about the data
 
+- search that distinguishes reviewed records, related evidence, the 2022 chart, the later image, and terms not covered;
+- what the 2022 chart reveals about its own reliability: 125 → 116 plotted items, ρ ≈ 0.14, and wider intervals for sparse items;
+- a readability floor for small labels.
+
+### v0.4 — Chart first
+
+- one public page ordered as community map → what stands out → two snapshots → data about the data → evidence check → sources;
+- an original diagram of the community chart using a small set of cited published values;
+- the later image, including Doing Math, presented as a distinct snapshot without assigned values.
+
+## Candidates, not scheduled
+
+- provenance-complete real-world/self-report signal layer, and a Signal–Evidence Gap view once that dataset exists;
+- contradiction records and outcome-specific evidence states;
+- evidence change history and stronger source-quality and methodology metadata;
 - compare mode that keeps evidence, safety, cost, accessibility, and uncertainty separate rather than collapsing them into one score;
-- “what evidence would change confidence?” research-gap view;
-- source-quality facets;
-- evidence-delta release notes.
-
-## Later
-
-- broader knowledge-graph traversal across interventions, outcomes, populations, risks, and evidence;
-- Simple ↔ Detailed ↔ Research presentation modes;
-- public contribution/reviewer workflow;
-- API;
-- signed evidence bundles and independent reviewer attestations.
+- a "what evidence would change confidence?" research-gap view;
+- broader knowledge-graph traversal, a public contribution/reviewer workflow, an API, and signed evidence bundles.
 
 ## Explicit non-goals
 
 - personalized recommendations or dosing;
 - consumer rankings of experimental/high-risk substances;
-- one-number “best intervention” scores;
+- one-number "best intervention" scores;
 - account creation or personal health-data collection;
 - automatic publication of unreviewed health claims.

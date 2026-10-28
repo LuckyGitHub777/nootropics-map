@@ -46,8 +46,8 @@ def main() -> int:
         errors.append("social preview metadata missing")
     app = (ROOT / "web" / "app.js").read_text(encoding="utf-8")
     styles = (ROOT / "web" / "styles.css").read_text(encoding="utf-8")
-    if 'id="mapKey"' not in index or "compactOffsets" not in app or ".map-key-item" not in styles:
-        errors.append("responsive mobile map key/collision treatment missing")
+    if 'id="mapKey"' not in index or "compact ?" not in app or ".map-key" not in styles:
+        errors.append("responsive community map and value table missing")
     prohibited_exts = {".jpg", ".jpeg", ".png", ".webp"}
     skip_dirs = {".git", "_site", "node_modules"}  # build output and VCS internals are not release sources
     images = {p.relative_to(ROOT) for p in ROOT.rglob("*")
