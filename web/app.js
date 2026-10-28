@@ -4,7 +4,7 @@
   const state = { interventions: [], claims: [], sources: [], query: '' };
 
   // Published 2022 community analysis (result table and plotting code). Seven cited values, not the dataset.
-  // count = total ratings; p = modeled probability of a rating of 10; lo/hi = published model interval.
+  // count = total ratings; p = modeled probability of a top (life-changing) rating; lo/hi = published model interval.
   const COMMUNITY_EXAMPLES = [
     { name: 'Weightlifting', count: 567, p: 0.121, lo: 0.093, hi: 0.153 },
     { name: 'Trying to get more sleep', count: 993, p: 0.075, lo: 0.060, hi: 0.093 },
@@ -184,7 +184,7 @@
     svg.appendChild(svgEl('line', { x1: m.l, x2: W - m.r, y1: ys, y2: ys, class: 'split' }));
     const regionText = compact
       ? [[`${REGIONS.uncommonOften} items`, (m.l + xs) / 2, m.t + 18, 'middle'], [`${REGIONS.commonRarely} items`, W - m.r - 8, H - m.b - 12, 'end']]
-      : [[`Uncommon, often a 10 · ${REGIONS.uncommonOften} items`, m.l + 14, m.t + 24, 'start'], [`Common, rarely a 10 · ${REGIONS.commonRarely} items`, W - m.r - 14, H - m.b - 16, 'end']];
+      : [[`Uncommon, often life-changing · ${REGIONS.uncommonOften} items`, m.l + 14, m.t + 24, 'start'], [`Common, rarely life-changing · ${REGIONS.commonRarely} items`, W - m.r - 14, H - m.b - 16, 'end']];
     regionText.forEach(([text, tx, ty, anchor]) => svg.appendChild(svgEl('text', { x: tx, y: ty, 'text-anchor': anchor, class: 'region-label' }, text)));
 
     // Axes.
@@ -197,7 +197,7 @@
       svg.appendChild(svgEl('text', { x: m.l - (compact ? 7 : 10), y: y(v) + 4, 'text-anchor': 'end', class: 'tick' }, String(v)));
     });
     svg.appendChild(svgEl('text', { x: (m.l + W - m.r) / 2, y: H - (compact ? 14 : 20), 'text-anchor': 'middle', class: 'axis-title' }, 'Number of ratings →'));
-    const yt = svgEl('text', { x: 0, y: 0, 'text-anchor': 'middle', class: 'axis-title', transform: `translate(${compact ? 13 : 26} ${(m.t + H - m.b) / 2}) rotate(-90)` }, compact ? 'Chance of a 10 →' : 'Reported life-changing probability →');
+    const yt = svgEl('text', { x: 0, y: 0, 'text-anchor': 'middle', class: 'axis-title', transform: `translate(${compact ? 13 : 26} ${(m.t + H - m.b) / 2}) rotate(-90)` }, compact ? 'Life-changing probability →' : 'Reported life-changing probability →');
     svg.appendChild(yt);
 
     // Points with intervals and direct labels (desktop) or index numbers (compact).

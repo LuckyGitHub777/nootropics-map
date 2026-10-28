@@ -22,7 +22,9 @@ SAFETY_LINE = "Information only. Not medical advice. No diagnosis, treatment, do
 # Visitor-facing copy explains the subject, not the product, and does not address the reader.
 BANNED_PHRASES = ["system of record", "git", "pull request", "required check", "ci ", "build", "versioned", "versionable",
                   "north star", "trust architecture", "why trust", "trust the trace", "front door", "v0.", "in this release",
-                  "guided reading", "talk to a clinician", "clinician", "receipt", "pathway"]
+                  "guided reading", "talk to a clinician", "clinician", "receipt", "pathway",
+                  # Undefined scale jargon and over-broad provenance claims.
+                  "chance of a 10", "of a 10", "rarely a 10", "often a 10", "every number on this page"]
 SECOND_PERSON = re.compile(r"\b(you|your|yours|yourself)\b", re.I)
 
 # Published 2022 community analysis: the seven cited values (result table, verified 2026-10-28 against
@@ -37,7 +39,7 @@ CITED = {
     "Omega-3": (956, 0.010, 0.006, 0.014),
 }
 # Facts stated in the insights, each derived from the citation set or the published plotting code.
-INSIGHT_FACTS = ["top ten of 125 items", "Weightlifting ranks third", "0.121", "0.128", "intervals overlap", "2,553 ratings",
+INSIGHT_FACTS = ["top ten of 125 items", "Weightlifting ranks third", "Third of 125 items at 0.121", "2,553 ratings",
                  "more than any other item", "0.030", "956 to 1,322 ratings", "ρ ≈ 0.14", "fewer than 50 ratings", "about four times wider",
                  "500 or more", "Doing Math", "The chart changed."]
 DATA_FACTS = ["125", "116", "125 result-table items · 116 plotted", "ρ ≈ 0.14", "Popularity barely tracks reported transformation.",
@@ -238,6 +240,18 @@ def check_copy(html: str, app: str) -> list[str]:
             errors.append(f"product or visitor-directed language on the public page: {phrase!r}")
     if SECOND_PERSON.search(page + " " + js_user_strings(app)):
         errors.append("public copy must not address the reader")
+    # Reviewed-evidence text shown on the page follows the same impersonal voice.
+    for name in ("interventions.json", "claims.json", "sources.json"):
+        shown = json.dumps(json.loads((ROOT / "data" / name).read_text(encoding="utf-8")), ensure_ascii=False)
+        if SECOND_PERSON.search(shown):
+            errors.append(f"data/{name} addresses the reader")
+    for label in ["Life-changing probability", "Seven things that stand out", "All community-chart figures on this page come from this published state",
+                  "Life-changing probability is the modeled share of ratings at the top of the scale"]:
+        if label not in page:
+            errors.append(f"plain-language label missing: {label!r}")
+    for label in ["Uncommon, often life-changing", "Common, rarely life-changing", "Reported life-changing probability →", "'Life-changing probability →'"]:
+        if label not in app:
+            errors.append(f"map label missing: {label!r}")
     if SAFETY_LINE not in page:
         errors.append("neutral information-only line missing")
     words = len(re.findall(r"[A-Za-z0-9][A-Za-z0-9,.'’\-]*", page))
