@@ -19,6 +19,118 @@
     strong: { stroke: '#d9c8a2', fill: '#d9c8a2' }
   };
 
+  // search-resolution:start
+  // Search context is navigation metadata, not evidence. Reviewed evidence comes only from data/*.json.
+  // Each source-context term below was checked by name against the published 2022 result table (or, for
+  // the later image, against its labels). No ratings, counts, coordinates or rankings are carried here,
+  // and this list is deliberately not an inventory of either source.
+  const SOURCE_CONTEXT = [
+    { term: 'Creatine', source: 'published-2022', reviewed: 'creatine', relation: 'exact',
+      note: 'Raters were asked how it felt, while the reviewed claim concerns strength, power and repeated high-intensity effort. The two answer different questions.' },
+    { term: 'Meditation', source: 'published-2022', reviewed: 'meditation', relation: 'exact' },
+    { term: 'Weightlifting', aliases: ['weight lifting'], source: 'published-2022', reviewed: 'physical-activity', relation: 'broader' },
+    { term: 'Caffeine', source: 'published-2022' },
+    { term: 'Theanine', aliases: ['l-theanine'], source: 'published-2022' },
+    { term: 'Doing Math', source: 'later-image' }
+  ];
+  const REVIEWED_ALIASES = { 'physical-activity': ['exercise'] };
+  const SOURCE_STATE_LINK = './explore.html#sourceState';
+
+  const normalizeQuery = (text = '') => String(text).normalize('NFKD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+
+  function phraseMatches(query, phrase) {
+    const p = normalizeQuery(phrase);
+    if (!query || !p) return false;
+    if (p === query) return true;
+    if (query.length < 3) return false;
+    if (p.startsWith(query) || p.includes(` ${query}`)) return true;
+    return (` ${query} `).includes(` ${p} `);
+  }
+
+  function resolveSearch(rawQuery, interventions) {
+    const query = normalizeQuery(rawQuery);
+    const display = String(rawQuery || '').trim().replace(/\s+/g, ' ');
+    if (!query) return { state: 'empty' };
+    const reviewed = interventions.filter((item) =>
+      [item.name, item.slug.replace(/-/g, ' '), ...(REVIEWED_ALIASES[item.slug] || [])].some((p) => phraseMatches(query, p)));
+    const contexts = SOURCE_CONTEXT.filter((entry) => [entry.term, ...(entry.aliases || [])].some((p) => phraseMatches(query, p)));
+    if (reviewed.length) {
+      const context = contexts.find((entry) => entry.relation === 'exact' && entry.reviewed === reviewed[0].slug) || null;
+      return { state: 'reviewed', query: display, items: reviewed, context };
+    }
+    const bySlug = (slug) => interventions.find((item) => item.slug === slug);
+    const broader = contexts.find((entry) => entry.relation === 'broader' && bySlug(entry.reviewed));
+    if (broader) return { state: 'broader', query: display, items: [bySlug(broader.reviewed)], context: broader };
+    const published = contexts.find((entry) => entry.source === 'published-2022');
+    if (published) return { state: 'published-2022', query: display, items: [], context: published };
+    const later = contexts.find((entry) => entry.source === 'later-image');
+    if (later) return { state: 'later-image', query: display, items: [], context: later };
+    if (query.length < 3) return { state: 'typing', query: display };
+    return { state: 'not-mapped', query: display, items: [] };
+  }
+
+  function describeResolution(result) {
+    const c = result.context;
+    const first = result.items && result.items[0];
+    switch (result.state) {
+      case 'reviewed': {
+        const many = result.items.length > 1;
+        return {
+          label: many ? 'Reviewed records' : 'Reviewed record',
+          title: many ? result.items.map((item) => item.name).join(' · ') : first.name,
+          body: many
+            ? 'Reviewed Nootropics Map records match this search. Each evidence receipt states one bounded claim, its limitations and its sources.'
+            : 'A reviewed Nootropics Map record exists. Its evidence receipt is the authoritative claim here, with its limitations and sources.',
+          secondary: c
+            ? `${c.term} also appears in the published 2022 community analysis as self-reported experience, kept separate from the reviewed claim.${c.note ? ` ${c.note}` : ''}`
+            : '',
+          actions: result.items.map((item) => ({ slug: item.slug, text: `Open the ${item.name} record` })),
+          link: null
+        };
+      }
+      case 'broader':
+        return {
+          label: 'Broader reviewed record',
+          title: `Closest reviewed record: ${first.name}`,
+          body: `There is no reviewed record for ${c.term} itself. The ${first.name} record is broader than the searched term: its claim is about ${first.name.toLowerCase()} in general, not ${c.term.toLowerCase()} specifically.`,
+          secondary: `${c.term} also appears in the published 2022 community analysis as self-reported experience. That signal and the reviewed claim measure different outcomes, so they are not compared here.`,
+          actions: [{ slug: first.slug, text: `Open the ${first.name} record` }],
+          link: { href: SOURCE_STATE_LINK, text: 'How the source states differ' }
+        };
+      case 'published-2022':
+        return {
+          label: 'Published 2022 community source',
+          title: c.term,
+          body: `${c.term} appears in the published 2022 community analysis. There is no reviewed Nootropics Map record for it yet.`,
+          secondary: 'Community ratings are self-reported experience: source context, not evidence of efficacy or safety.',
+          actions: [],
+          link: { href: SOURCE_STATE_LINK, text: 'How the source states differ' }
+        };
+      case 'later-image':
+        return {
+          label: 'Later supplied image',
+          title: c.term,
+          body: `${c.term} appears only in the later supplied chart image, separate from the published 2022 analysis, and is absent from its result table.`,
+          secondary: `The dataset behind the later image has not been published, and there is no reviewed Nootropics Map record for ${c.term}.`,
+          actions: [],
+          link: { href: SOURCE_STATE_LINK, text: 'How the source states differ' }
+        };
+      case 'not-mapped':
+        return {
+          label: 'Not mapped in this release',
+          title: `“${result.query}”`,
+          body: 'Search covers reviewed records and selected source context currently mapped by Nootropics Map; it is not a complete inventory of the upstream dataset.',
+          secondary: '',
+          actions: [],
+          link: null
+        };
+      default:
+        return null;
+    }
+  }
+  // search-resolution:end
+
   const $ = (sel) => document.querySelector(sel);
   const $$ = (sel) => [...document.querySelectorAll(sel)];
 
@@ -55,7 +167,7 @@
     const items = matchingItems();
     const grid = $('#cardGrid');
     grid.innerHTML = '';
-    $('#emptyState').hidden = items.length !== 0;
+    renderEmptyState(items.length);
 
     items.forEach((item) => {
       const claims = item.claim_ids.map(claimById).filter(Boolean);
@@ -285,9 +397,79 @@
     }
   }
 
+  let announceTimer = null;
+  let lastAnnounced = '';
+
+  function renderResolution() {
+    const panel = $('#searchResolution');
+    const result = resolveSearch(state.query, state.interventions);
+    const view = describeResolution(result);
+    const announce = $('#searchAnnounce');
+    clearTimeout(announceTimer);
+    if (!view) {
+      panel.hidden = true;
+      panel.removeAttribute('data-state');
+      if (result.state === 'empty') { announce.textContent = ''; lastAnnounced = ''; }
+      return;
+    }
+    panel.dataset.state = result.state;
+    $('#resolutionLabel').textContent = view.label;
+    $('#resolutionTitle').textContent = view.title;
+    $('#resolutionBody').textContent = view.body;
+    const secondary = $('#resolutionSecondary');
+    secondary.textContent = view.secondary;
+    secondary.hidden = !view.secondary;
+
+    const filtered = state.category !== 'all' && view.actions.some((action) => itemBySlug(action.slug)?.category !== state.category);
+    const filterNote = $('#resolutionFilter');
+    filterNote.hidden = !filtered;
+    filterNote.textContent = filtered ? 'The current category filter hides this record from the map and library; the record still opens here.' : '';
+
+    const actions = $('#resolutionActions');
+    actions.replaceChildren();
+    view.actions.forEach((action) => {
+      const item = itemBySlug(action.slug);
+      if (!item) return;
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'resolution-action';
+      button.textContent = `${action.text} →`;
+      button.addEventListener('click', () => openDetail(item));
+      actions.appendChild(button);
+    });
+    if (view.link) {
+      const link = document.createElement('a');
+      link.className = 'resolution-link';
+      link.href = view.link.href;
+      link.textContent = view.link.text;
+      actions.appendChild(link);
+    }
+    actions.hidden = !actions.childElementCount;
+    panel.hidden = false;
+
+    // Announce once typing settles, and only when the resolved state changes, to keep screen readers quiet.
+    const key = `${result.state}|${view.title}`;
+    announceTimer = setTimeout(() => {
+      if (key === lastAnnounced) return;
+      lastAnnounced = key;
+      announce.textContent = `${view.label}: ${view.title}.`;
+    }, 650);
+  }
+
+  function renderEmptyState(count) {
+    const empty = $('#emptyState');
+    empty.hidden = count !== 0;
+    if (count !== 0) return;
+    const view = describeResolution(resolveSearch(state.query, state.interventions));
+    empty.textContent = view && state.query.trim()
+      ? `No reviewed record in this view matches this search. Search result above: ${view.label}.`
+      : 'No reviewed record in this view matches this search.';
+  }
+
   function update() {
     renderCards();
     renderMap();
+    renderResolution();
   }
 
   function bindEvents() {

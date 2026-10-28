@@ -138,7 +138,7 @@ section { scroll-margin-top: 24px; }
 .halo { paint-order: stroke; stroke: var(--panel); stroke-width: 6px; stroke-linejoin: round; }
 .o-center { fill: var(--panel); stroke: var(--accent); stroke-width: 1.5; }
 .o-ctitle { font: 400 20px var(--display); fill: var(--text); }
-.o-csub { font: 400 11px var(--mono); fill: var(--faint); }
+.o-csub { font: 400 12px var(--mono); fill: var(--faint); }
 .branch-list { display: none; }
 @media (max-width: 759px) { .orbit { display: none; } .branch-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 16px; } }
 .read-panel { padding: 30px; display: flex; flex-direction: column; gap: 16px; }
@@ -175,6 +175,53 @@ section { scroll-margin-top: 24px; }
 .foot .links { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px; }
 .safety { max-width: 760px; border: 1px solid var(--line); border-radius: 18px; padding: 20px 24px; background: var(--panel); display: grid; gap: 8px; color: var(--muted); }
 .fine { font-size: .88rem; color: var(--faint); }
+
+/* Data about data: one editorial sequence on the centered axis. Every figure is also stated in text. */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.dad-list { list-style: none; margin: 0 auto; padding: 0; max-width: 760px; display: grid; }
+.dad-step { display: grid; justify-items: center; gap: 14px; text-align: center; padding: 40px 0; border-top: 1px solid var(--line); }
+.dad-step:last-child { border-bottom: 1px solid var(--line); }
+.dad-step h3 { font-size: clamp(1.45rem, 2.8vw, 2.05rem); line-height: 1.2; max-width: 30ch; }
+.dad-step > p:not(.dad-num):not(.dad-figure):not(.dad-caption) { color: var(--muted); max-width: 60ch; margin: 0; }
+.dad-num { margin: 0; font: 500 12px var(--mono); letter-spacing: .18em; color: var(--accent); }
+.dad-figure { margin: 4px 0 0; display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 14px; }
+.dad-big { font: 400 clamp(2rem, 5vw, 3rem)/1.05 var(--display); color: var(--text); font-variant-numeric: lining-nums tabular-nums; }
+.dad-arrow { font: 400 1.6rem var(--display); color: var(--accent); }
+.dad-caption { margin: 0; font: 500 12px/1.5 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); max-width: 56ch; }
+.dad figure { margin: 0; width: 100%; padding: 0 12px; box-sizing: border-box; display: grid; justify-items: center; gap: 14px; }
+.rho-scale { position: relative; width: min(100%, 420px); height: 44px; margin: 4px 0 0; }
+.rho-track { position: absolute; left: 0; right: 0; top: 10px; border-top: 1px solid var(--line-strong); }
+.rho-tick { position: absolute; top: 20px; transform: translateX(-50%); font: 500 12px var(--mono); color: var(--faint); }
+.rho-tick::before { content: ""; position: absolute; left: 50%; top: -14px; height: 9px; border-left: 1px solid var(--line-strong); }
+.rho-tick.at-min { left: 0; transform: none; }
+.rho-tick.at-min::before { left: 0; }
+.rho-tick.at-zero { left: 50%; }
+.rho-tick.at-max { left: auto; right: 0; transform: none; }
+.rho-tick.at-max::before { left: auto; right: 0; }
+.rho-mark { position: absolute; left: 57.08%; top: 4px; width: 13px; height: 13px; margin-left: -6.5px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+.dad figure.dad-widths { width: min(100%, 560px); }
+.iw-row { width: 100%; display: grid; justify-items: center; gap: 10px; padding: 6px 0; }
+.iw-label { margin: 0; display: grid; gap: 2px; justify-items: center; }
+.iw-label strong { font: 400 1.15rem var(--display); color: var(--text); }
+.iw-label span { font: 500 13px var(--mono); color: var(--muted); }
+.iw-line { display: block; height: 14px; position: relative; border-top: 1px solid var(--accent); top: 7px; }
+.iw-line::before, .iw-line::after { content: ""; position: absolute; top: -8px; height: 15px; border-left: 1px solid var(--accent); }
+.iw-line::before { left: 0; }
+.iw-line::after { right: 0; }
+.iw-low { width: 100%; }
+.iw-high { width: 25.53%; }
+.dad-neq { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.dad-neq li { border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; font-size: .92rem; color: var(--text); background: var(--panel-2); }
+.dad-neq li span[aria-hidden] { color: var(--accent); margin: 0 .2em; }
+.dad-close { margin: 40px auto 0; max-width: 34ch; text-align: center; font: italic 400 clamp(1.3rem, 2.6vw, 1.8rem)/1.35 var(--display); color: var(--accent); text-wrap: balance; }
+@media (max-width: 640px) {
+  .dad-step { padding: 30px 0; }
+  .dad-caption { font-size: 11.5px; letter-spacing: .06em; }
+}
+
+/* Readability floor: the orbit shrinks in the two-column reader, so its branch numbers grow there.
+   The centre caption keeps 12px: it sits on a 112-unit chord of the centre circle and larger text crosses the circle. */
+@media (min-width: 980px) and (max-width: 1199px) { .o-num { font-size: 14.5px; } }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
