@@ -298,10 +298,14 @@ def check_copy(html: str, app: str) -> list[str]:
     snap_text = html_lib.unescape(" ".join(re.sub(r"<[^>]+>", " ", snap).split()))
     for needle in ["Published data vs. later image", "Published 2022 data", "Public table and reproducible values",
                    "Later image · underlying data unavailable", "Additional labels, no public dataset", "125", "116", "Doing Math",
+                   "116 plotted under the published code’s inclusion filter",
                    "A separate later image contains labels that are not present in the published 2022 dataset.",
                    "Its underlying data is unavailable, so no numerical values are taken from it."]:
         if needle not in snap_text:
             errors.append(f"published-data vs. later-image distinction missing: {needle!r}")
+    # The plotting filter is on a subset of ratings, not total count: never restate it as a total-rating threshold.
+    if re.search(r"more than 10\b|over 10 ratings|at least 1[01] ratings", snap_text, re.I):
+        errors.append("the plotting filter must not be restated as a total-rating threshold")
     # Doing Math never carries a figure: every sentence that names it is free of digits other than the year 2022.
     vp = Inspector()
     vp.feed(html)

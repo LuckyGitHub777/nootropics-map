@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.1 — 2026-10-28
+
+- Removed public wording that depended on prior context, such as references to the chart having changed, to snapshots, or to an internal index.
+- Described the published 2022 data and the separate later image in self-contained terms: figures on the page come from the published 2022 data, and the later image's underlying data is unavailable, so no values are taken from it.
+- Simplified search copy: plain wording for later-image and unmatched results, and a neutral search placeholder. Doing Math still resolves when searched.
+- No changes to evidence records, data values, map geometry or styling.
+
 ## 0.4.0 — 2026-10-28
 
 - Rebuilt the public experience as one page ordered around the community chart: community map, what stands out, two snapshots, data about the data, evidence check, and sources. The first screen leads with the question and the map.
