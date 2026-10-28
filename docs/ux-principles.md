@@ -17,6 +17,6 @@ Museum calm + laboratory rigor.
 
 ## Signature interaction
 
-The community map shows how the published 2022 chart works: number of ratings against the reported chance of a life-changing rating, on logarithmic axes, with the published regions and a few cited items drawn with their model intervals. It is an original diagram, not a reproduction of either version of the chart.
+The page presents one community chart as one information object: number of ratings against the reported probability of a life-changing rating, on logarithmic axes, with its two shaded regions and a few selected items drawn with their model intervals. The map is an original diagram, not a reproduction of the chart. Public copy describes what the chart shows; it does not narrate datasets, chart versions or how the chart was obtained, and no chart item is singled out for special treatment.
 
 The evidence check then shows evidence maturity and confidence for each reviewed claim as two separate ordinal measures, without implying effect size. A quantitative Community Signal layer must not ship until it has its own source-backed provenance.

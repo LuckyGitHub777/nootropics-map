@@ -1,6 +1,6 @@
 {
   "name": "nootropics-map",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "private": true,
   "description": "Source-backed visual evidence map for nootropics and cognition-related interventions.",
   "scripts": {

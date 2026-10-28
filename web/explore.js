@@ -3,8 +3,8 @@
 (() => {
   'use strict';
   const MOVED = {
-    sourceState: 'snapshots',
-    dataAboutData: 'data',
+    sourceState: 'map',
+    dataAboutData: 'insights',
     lenses: 'evidence',
     pathways: 'evidence',
     receipts: 'evidence',

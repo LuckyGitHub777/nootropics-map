@@ -3,7 +3,7 @@
 
   const state = { interventions: [], claims: [], sources: [], query: '' };
 
-  // Published 2022 community analysis (result table and plotting code). Seven cited values, not the dataset.
+  // Community chart analysis (result table and plotting code). Seven cited values, not the dataset.
   // count = total ratings; p = modeled probability of a top (life-changing) rating; lo/hi = published model interval.
   const COMMUNITY_EXAMPLES = [
     { name: 'Weightlifting', count: 567, p: 0.121, lo: 0.093, hi: 0.153 },
@@ -14,8 +14,8 @@
     { name: 'Theanine', count: 1322, p: 0.013, lo: 0.009, hi: 0.018 },
     { name: 'Omega-3', count: 956, p: 0.010, lo: 0.006, hi: 0.014 }
   ];
-  // Published plotting-code regions over the 116 plotted items.
-  const REGIONS = { countSplit: 300, pSplit: 0.02, uncommonOften: 18, commonRarely: 20, elsewhere: 78 };
+  // Shaded regions from the chart's plotting code.
+  const REGIONS = { countSplit: 300, pSplit: 0.02 };
 
   const confidenceRank = { unknown: 0, low: 1, moderate: 2, high: 3 };
   const bandRank = { emerging: 1, moderate: 2, strong: 3 };
@@ -23,21 +23,19 @@
 
   // search-resolution:start
   // Search context is navigation metadata, not evidence. Reviewed evidence comes only from data/*.json.
-  // Each source-context term below was checked by name against the published 2022 result table (or, for
-  // the later image, against its labels). No ratings, counts, coordinates or rankings are carried here,
-  // and this list is deliberately not an inventory of either source.
-  const SOURCE_CONTEXT = [
-    { term: 'Creatine', source: 'published-2022', reviewed: 'creatine', relation: 'exact',
+  // Each chart item below is a label on the community chart. All are ordinary chart items: no ratings,
+  // counts, coordinates or rankings are carried here, and this list is deliberately not an inventory.
+  const CHART_ITEMS = [
+    { term: 'Creatine', reviewed: 'creatine', relation: 'exact',
       note: 'Raters judged its felt effect; the reviewed claim concerns strength and power. Different questions.' },
-    { term: 'Meditation', source: 'published-2022', reviewed: 'meditation', relation: 'exact' },
-    { term: 'Weightlifting', aliases: ['weight lifting'], source: 'published-2022', reviewed: 'physical-activity', relation: 'broader' },
-    { term: 'Caffeine', source: 'published-2022' },
-    { term: 'Theanine', aliases: ['l-theanine'], source: 'published-2022' },
-    { term: 'Omega-3', aliases: ['omega 3'], source: 'published-2022' },
-    { term: 'Doing Math', source: 'later-image' }
+    { term: 'Meditation', reviewed: 'meditation', relation: 'exact' },
+    { term: 'Weightlifting', aliases: ['weight lifting'], reviewed: 'physical-activity', relation: 'broader' },
+    { term: 'Caffeine' },
+    { term: 'Theanine', aliases: ['l-theanine'] },
+    { term: 'Omega-3', aliases: ['omega 3'] },
+    { term: 'Doing Math' }
   ];
   const REVIEWED_ALIASES = { 'physical-activity': ['exercise'] };
-  const SNAPSHOTS_LINK = '#snapshots';
 
   const normalizeQuery = (text = '') => String(text).normalize('NFKD').replace(/[̀-ͯ]/g, '')
     .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
@@ -57,7 +55,7 @@
     if (!query) return { state: 'empty' };
     const reviewed = interventions.filter((item) =>
       [item.name, item.slug.replace(/-/g, ' '), ...(REVIEWED_ALIASES[item.slug] || [])].some((p) => phraseMatches(query, p)));
-    const contexts = SOURCE_CONTEXT.filter((entry) => [entry.term, ...(entry.aliases || [])].some((p) => phraseMatches(query, p)));
+    const contexts = CHART_ITEMS.filter((entry) => [entry.term, ...(entry.aliases || [])].some((p) => phraseMatches(query, p)));
     if (reviewed.length) {
       const context = contexts.find((entry) => entry.relation === 'exact' && entry.reviewed === reviewed[0].slug) || null;
       return { state: 'reviewed', query: display, items: reviewed, context };
@@ -65,10 +63,7 @@
     const bySlug = (slug) => interventions.find((item) => item.slug === slug);
     const broader = contexts.find((entry) => entry.relation === 'broader' && bySlug(entry.reviewed));
     if (broader) return { state: 'broader', query: display, items: [bySlug(broader.reviewed)], context: broader };
-    const published = contexts.find((entry) => entry.source === 'published-2022');
-    if (published) return { state: 'published-2022', query: display, items: [], context: published };
-    const later = contexts.find((entry) => entry.source === 'later-image');
-    if (later) return { state: 'later-image', query: display, items: [], context: later };
+    if (contexts.length) return { state: 'chart', query: display, items: [], context: contexts[0] };
     if (query.length < 3) return { state: 'typing', query: display };
     return { state: 'not-mapped', query: display, items: [] };
   }
@@ -80,10 +75,10 @@
       case 'reviewed': {
         const many = result.items.length > 1;
         return {
-          label: 'Reviewed',
+          label: 'Reviewed evidence',
           title: many ? result.items.map((item) => item.name).join(' · ') : first.name,
           body: 'A reviewed record with its claim, limitations and sources.',
-          secondary: c ? `Also in the 2022 chart.${c.note ? ` ${c.note}` : ''}` : '',
+          secondary: c ? `Also in the community chart.${c.note ? ` ${c.note}` : ''}` : '',
           actions: result.items.map((item) => ({ slug: item.slug, text: `Open ${item.name}` })),
           link: null
         };
@@ -93,33 +88,24 @@
           label: 'Related evidence',
           title: `${c.term} → ${first.name}`,
           body: `No record for ${c.term} itself. The ${first.name} record is broader than the searched term.`,
-          secondary: `${c.term} is in the 2022 chart. The chart and the claim measure different outcomes.`,
+          secondary: `${c.term} appears in the community chart. The chart and the claim measure different outcomes.`,
           actions: [{ slug: first.slug, text: `Open ${first.name}` }],
-          link: { href: SNAPSHOTS_LINK, text: 'Published data vs. later image' }
+          link: null
         };
-      case 'published-2022':
+      case 'chart':
         return {
-          label: '2022 chart',
+          label: 'Chart item',
           title: c.term,
-          body: `${c.term} appears in the published 2022 community analysis. There is no reviewed record for it.`,
-          secondary: 'Self-reported ratings: not evidence of efficacy or safety.',
+          body: `${c.term} appears in the community chart.`,
+          secondary: 'There is no reviewed evidence record for this item on the site. Chart placement reflects community reporting, not proof of efficacy or safety.',
           actions: [],
-          link: { href: SNAPSHOTS_LINK, text: 'Published data vs. later image' }
-        };
-      case 'later-image':
-        return {
-          label: 'Later image',
-          title: c.term,
-          body: `${c.term} appears in a separate later image but not in the published 2022 dataset.`,
-          secondary: 'The later image’s underlying data is unavailable, so no numerical comparison is made. There is no reviewed record for it.',
-          actions: [],
-          link: { href: SNAPSHOTS_LINK, text: 'Published data vs. later image' }
+          link: null
         };
       case 'not-mapped':
         return {
           label: 'No matching entry',
           title: `“${result.query}”`,
-          body: 'Search includes the reviewed evidence and selected chart labels shown on this page.',
+          body: 'Search covers the reviewed evidence and selected items from the community chart.',
           secondary: '',
           actions: [],
           link: null
@@ -139,6 +125,14 @@
     catch { return ''; }
   };
   let syncingLocation = false;
+  const RETIRED_ANCHORS = { snapshots: 'map', data: 'insights' };
+  function redirectRetiredAnchor() {
+    const to = RETIRED_ANCHORS[hashSlug()];
+    if (!to) return false;
+    history.replaceState(history.state, '', `#${to}`);
+    document.getElementById(to)?.scrollIntoView();
+    return true;
+  }
   const confidenceFor = (item) => {
     const claims = item.claim_ids.map(claimById).filter(Boolean);
     if (!claims.length) return 'unknown';
@@ -182,9 +176,10 @@
     svg.appendChild(svgEl('rect', { x: xs, y: ys, width: W - m.r - xs, height: H - m.b - ys, class: 'region region-rarely' }));
     svg.appendChild(svgEl('line', { x1: xs, x2: xs, y1: m.t, y2: H - m.b, class: 'split' }));
     svg.appendChild(svgEl('line', { x1: m.l, x2: W - m.r, y1: ys, y2: ys, class: 'split' }));
+    // Region names are drawn where they fit; the caption names both regions at every width.
     const regionText = compact
-      ? [[`${REGIONS.uncommonOften} items`, (m.l + xs) / 2, m.t + 18, 'middle'], [`${REGIONS.commonRarely} items`, W - m.r - 8, H - m.b - 12, 'end']]
-      : [[`Uncommon, often life-changing · ${REGIONS.uncommonOften} items`, m.l + 14, m.t + 24, 'start'], [`Common, rarely life-changing · ${REGIONS.commonRarely} items`, W - m.r - 14, H - m.b - 16, 'end']];
+      ? []
+      : [['Uncommon, often life-changing', m.l + 14, m.t + 24, 'start'], ['Common, rarely life-changing', W - m.r - 14, H - m.b - 16, 'end']];
     regionText.forEach(([text, tx, ty, anchor]) => svg.appendChild(svgEl('text', { x: tx, y: ty, 'text-anchor': anchor, class: 'region-label' }, text)));
 
     // Axes.
@@ -414,13 +409,14 @@
       else history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
     });
     window.addEventListener('popstate', syncDetailFromLocation);
-    window.addEventListener('hashchange', syncDetailFromLocation);
+    window.addEventListener('hashchange', () => { if (!redirectRetiredAnchor()) syncDetailFromLocation(); });
     window.matchMedia('(max-width: 650px)').addEventListener('change', renderCommunityMap);
   }
 
   async function load() {
     renderCommunityMap();
     renderMapKey();
+    redirectRetiredAnchor();
     try {
       const [interventions, claims, sources] = await Promise.all([
         fetch('../data/interventions.json').then((r) => r.json()),

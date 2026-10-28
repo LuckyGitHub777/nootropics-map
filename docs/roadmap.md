@@ -28,6 +28,12 @@ The roadmap expands the evidence experience only when provenance, safety, and UX
 - an original diagram of the community chart using a small set of cited published values;
 - the later image, including Doing Math, presented as a distinct snapshot without assigned values.
 
+### v0.4.2 — One chart
+
+- the public page presents one community chart as one information object: community map → what stands out → evidence check → sources;
+- dataset, chart-version and snapshot narration removed from the public page, along with figures that depended on it;
+- Doing Math treated as an ordinary chart item, and search reduced to reviewed evidence, related evidence, chart item and no matching entry.
+
 ## Candidates, not scheduled
 
 - provenance-complete real-world/self-report signal layer, and a Signal–Evidence Gap view once that dataset exists;

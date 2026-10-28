@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 WEB = ROOT / "web"
 CANONICAL = "https://luckygithub777.github.io/nootropics-map/"
 # Old guided-reading anchors and the main-page sections that replace them.
-MOVED = {"sourceState": "snapshots", "dataAboutData": "data", "lenses": "evidence", "pathways": "evidence",
+MOVED = {"sourceState": "map", "dataAboutData": "insights", "lenses": "evidence", "pathways": "evidence",
          "receipts": "evidence", "reading": "insights"}
 
 
