@@ -95,31 +95,31 @@
           body: `No record for ${c.term} itself. The ${first.name} record is broader than the searched term.`,
           secondary: `${c.term} is in the 2022 chart. The chart and the claim measure different outcomes.`,
           actions: [{ slug: first.slug, text: `Open ${first.name}` }],
-          link: { href: SNAPSHOTS_LINK, text: 'About the two snapshots' }
+          link: { href: SNAPSHOTS_LINK, text: 'Published data vs. later image' }
         };
       case 'published-2022':
         return {
           label: '2022 chart',
           title: c.term,
-          body: `${c.term} appears in the published 2022 community analysis. No reviewed record yet.`,
+          body: `${c.term} appears in the published 2022 community analysis. There is no reviewed record for it.`,
           secondary: 'Self-reported ratings: not evidence of efficacy or safety.',
           actions: [],
-          link: { href: SNAPSHOTS_LINK, text: 'About the two snapshots' }
+          link: { href: SNAPSHOTS_LINK, text: 'Published data vs. later image' }
         };
       case 'later-image':
         return {
           label: 'Later image',
           title: c.term,
-          body: `${c.term} appears only in the later supplied image, separate from the published 2022 analysis.`,
-          secondary: 'Its data is undocumented, so no figures apply. No reviewed record.',
+          body: `${c.term} appears in a separate later image but not in the published 2022 dataset.`,
+          secondary: 'The later image’s underlying data is unavailable, so no numerical comparison is made. There is no reviewed record for it.',
           actions: [],
-          link: { href: SNAPSHOTS_LINK, text: 'About the two snapshots' }
+          link: { href: SNAPSHOTS_LINK, text: 'Published data vs. later image' }
         };
       case 'not-mapped':
         return {
-          label: 'Not in the current index',
+          label: 'No matching entry',
           title: `“${result.query}”`,
-          body: 'Search covers reviewed records and selected chart items; it is not a complete inventory of the upstream dataset.',
+          body: 'Search includes the reviewed evidence and selected chart labels shown on this page.',
           secondary: '',
           actions: [],
           link: null
