@@ -42,7 +42,8 @@ CONTEXT_LEAKS = ["the chart changed", "two snapshots", "about the two snapshots"
                  "underlying data unavailable", "which figures can be checked", "a later image includes",
                  "data about the data", "inclusion filter", "not every result is plotted",
                  # Informational voice: describe the information, do not editorialize or instruct.
-                 "community signal", "different story", "check the evidence"]
+                 "community signal", "different story", "check the evidence",
+                 "follow the evidence", "read carefully", "checked against the evidence"]
 # Analytics that only make sense against one particular underlying result-table state stay off the page.
 SOURCE_STATE_ANALYTICS = [r"36,163", r"2,802", r"(?<![\d,.])125(?![\d,])", r"(?<![\d,.])116(?![\d,])", r"ρ", r"≈\s*4×", r"≈\s*3\.9×",
                           r"<\s*50 ratings", r"500\+ ratings", r"0\.048", r"(?<![\d.])0\.012"]
@@ -369,8 +370,38 @@ def public_surface(html: str) -> str:
     return html_lib.unescape(" ".join((text + " " + " ".join(attrs)).split()))
 
 
+SHARE_DESCRIPTION = "Reported life-changing impact across behaviors, supplements and other interventions."
+SHARE_ALT = "Nootropics Map — What changes the mind?"
+
+
+def check_share(html: str) -> list[str]:
+    """Share metadata and the social card carry the same plain information as the page."""
+    errors: list[str] = []
+    for attr, name, want in [("name", "description", SHARE_DESCRIPTION), ("property", "og:description", SHARE_DESCRIPTION),
+                             ("name", "twitter:description", SHARE_DESCRIPTION), ("property", "og:image:alt", SHARE_ALT),
+                             ("name", "twitter:image:alt", SHARE_ALT)]:
+        found = re.findall(rf'<meta {attr}="{re.escape(name)}" content="([^"]*)"', html)
+        if found != [want]:
+            errors.append(f"share metadata {name} must be exactly {want!r} (found {found})")
+    png = (WEB / "social-preview.png").read_bytes()
+    if png[:8] != b"\x89PNG\r\n\x1a\n":
+        return errors + ["social preview must be a PNG"]
+    pos, chunks = 8, []
+    while pos < len(png):
+        length = int.from_bytes(png[pos:pos + 4], "big")
+        chunks.append(png[pos + 4:pos + 8].decode("latin-1"))
+        if chunks[-1] == "IHDR" and (int.from_bytes(png[pos + 8:pos + 12], "big"), int.from_bytes(png[pos + 12:pos + 16], "big")) != (1200, 630):
+            errors.append("social preview must be 1200×630")
+        pos += 12 + length
+    extra = sorted(set(chunks) - {"IHDR", "PLTE", "IDAT", "IEND", "sRGB", "gAMA", "pHYs"})
+    if extra:
+        errors.append(f"social preview carries metadata chunks: {extra}")
+    return errors
+
+
 def check_context(html: str, app: str) -> list[str]:
     errors: list[str] = []
+    errors += check_share(html)
     explore = (WEB / "explore.html").read_text(encoding="utf-8")
     surface = public_surface(html) + " " + public_surface(explore) + " " + js_user_strings(app)
     low = surface.lower()
